@@ -7,15 +7,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    //BadRequestException
-
     //UnauthorizedException
+    INVALID_EMAIL_OR_PASSWORD("4010", "등록되지 않은 이메일 또는 비밀번호를 잘못 입력했습니다."),
+    COOKIE_NOT_FOUND("4011", "쿠키를 찾을 수 없습니다."),
+    INVALID_TOKEN("4012", "유효하지 않은 토큰입니다."),
+    EXPIRED_TOKEN("4013", "만료된 토큰입니다."),
 
     //ForbiddenException
+    NO_ACCESS("4030", "접근 권한이 없습니다."),
 
     //NotFoundException
+    USER_NOT_FOUND("4040", "유저를 찾을 수 없습니다."),
 
     //ConflictException
+    DUPLICATED_NAME("4090","이미 사용 중인 이름입니다."),
+    DUPLICATED_EMAIL("4091", "이미 사용 중인 이메일입니다."),
 
     //ValidationException
     NOT_NULL("9001", "필수값이 누락되었습니다."),
