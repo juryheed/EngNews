@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.entity.User;
+import org.mjulikelion.engnews.exception.ErrorCode;
+import org.mjulikelion.engnews.exception.NotFoundException;
 import org.mjulikelion.engnews.repository.UserRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
