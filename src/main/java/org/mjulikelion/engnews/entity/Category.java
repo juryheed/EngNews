@@ -28,6 +28,6 @@ public class Category extends BaseEntity {
 
     //키워드와의 관계
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<keyword> keywords;
+    private List<Keyword> keywords;
 
 }
