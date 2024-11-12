@@ -2,6 +2,8 @@ package org.mjulikelion.engnews.authentication;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.mjulikelion.engnews.exception.ErrorCode;
+import org.mjulikelion.engnews.exception.UnauthorizedException;
 
 public class AuthenticationExtractor {
     public static final String TOKEN_COOKIE_NAME = "AccessToken";

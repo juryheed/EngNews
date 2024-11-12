@@ -2,6 +2,8 @@ package org.mjulikelion.engnews.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mjulikelion.engnews.exception.ErrorCode;
+import org.mjulikelion.engnews.exception.UnauthorizedException;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
