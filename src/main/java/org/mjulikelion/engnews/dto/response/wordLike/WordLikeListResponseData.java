@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.dto.response;
+package org.mjulikelion.engnews.dto.response.wordLike;
 
 import lombok.Builder;
 import lombok.Getter;
