@@ -19,6 +19,7 @@ public enum ErrorCode {
     //NotFoundException
     USER_NOT_FOUND("4040", "유저를 찾을 수 없습니다."),
     WORD_LIKE_NOT_FOUND("4042", "찜한 단어를 찾을 수 없습니다."),
+    CATEGORY_NOT_FOUND("4043", "카테고리를 찾을 수 없습니다."),
 
     //ConflictException
     DUPLICATED_NAME("4090","이미 사용 중인 이름입니다."),
