@@ -1,8 +1,8 @@
 package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
-import org.mjulikelion.engnews.dto.request.CreateWordLikeDto;
-import org.mjulikelion.engnews.dto.response.WordLikeListResponseData;
+import org.mjulikelion.engnews.dto.request.wordLike.CreateWordLikeDto;
+import org.mjulikelion.engnews.dto.response.wordLike.WordLikeListResponseData;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.entity.WordLike;
 import org.mjulikelion.engnews.exception.ErrorCode;
