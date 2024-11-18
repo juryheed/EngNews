@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.dto.request;
+package org.mjulikelion.engnews.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
