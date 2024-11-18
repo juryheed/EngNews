@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.dto.request;
+package org.mjulikelion.engnews.dto.request.wordLike;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
