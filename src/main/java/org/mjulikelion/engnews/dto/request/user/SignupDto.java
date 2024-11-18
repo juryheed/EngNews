@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.dto.request;
+package org.mjulikelion.engnews.dto.request.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
