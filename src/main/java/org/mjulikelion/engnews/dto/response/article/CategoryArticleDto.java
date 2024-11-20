@@ -2,7 +2,6 @@ package org.mjulikelion.engnews.dto.response.article;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.mjulikelion.engnews.dto.request.article.CategoryRequestDto;
 
 @Getter
 @Builder
