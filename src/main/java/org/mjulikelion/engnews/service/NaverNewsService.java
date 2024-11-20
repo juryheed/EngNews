@@ -6,10 +6,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
-import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.NotFoundException;
-import org.mjulikelion.engnews.repository.CategoryRepository;
+import org.mjulikelion.engnews.exception.UnauthorizedException;
+import org.mjulikelion.engnews.repository.KeywordRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NaverNewsService {
 
-    private final CategoryRepository categoryRepository;
+    private final KeywordRepository keywordRepository;
 
     @Value("${naver.client.id}")
     private String clientId;
@@ -35,18 +35,18 @@ public class NaverNewsService {
     @Value("${naver.client.secret}")
     private String clientSecret;
 
-    public String getNaverNews(User user, UUID categoryId){
+    public String getNaverNews(UUID keywordId){
 
         RestTemplate restTemplate = new RestTemplate();
 
-        //카테고리 찾기
-        String category = categoryRepository.findByUserAndId(user,categoryId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND)).getCategory();
+        // 키워드 찾기
+        String keyword = keywordRepository.findById(keywordId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND)).getKeyword();
 
         // URI 생성
         StringBuffer sb = new StringBuffer();
         sb.append("https://openapi.naver.com/v1/search/news.json?query=");
-        sb.append(category);
+        sb.append(keyword);
         sb.append("&display=10&start=1&sort=sim");
         String url = sb.toString();
 
@@ -93,9 +93,8 @@ public class NaverNewsService {
                 articles.add(CategoryArticleDto.from(title,link,imageUrl));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
         }
-
         return articles;
     }
 }
