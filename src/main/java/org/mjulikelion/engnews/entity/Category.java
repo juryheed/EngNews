@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.mjulikelion.engnews.entity.type.CategoryType;
 
 import java.util.List;
 
@@ -18,7 +19,8 @@ import java.util.List;
 public class Category extends BaseEntity {
 
     @Column(nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private CategoryType category;
 
     //유저와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
