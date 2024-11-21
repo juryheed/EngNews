@@ -41,7 +41,7 @@ public class ArticleLikeService {
                 .build();
     }
 
-    private String[] getTitleImageAndContentFromUrl(String url) {
+    public String[] getTitleImageAndContentFromUrl(String url) {
         String title = "";
         String imageUrl = "";
         String content = "";
