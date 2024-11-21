@@ -2,6 +2,7 @@ package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.PasswordHashEncryption;
+import org.mjulikelion.engnews.dto.response.user.MypageDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.exception.ConflictException;
 import org.mjulikelion.engnews.exception.ErrorCode;
@@ -16,6 +17,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordHashEncryption passwordHashEncryption;
+
+    public MypageDto getMypage(User user) {
+        return MypageDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
+    }
 
     public void validateIsPasswordMatches(String requestedPassword, String userPassword) {
         if (!passwordHashEncryption.matches(requestedPassword, userPassword)) {
@@ -34,6 +43,7 @@ public class UserService {
             throw new ConflictException(ErrorCode.DUPLICATED_NAME);
         }
     }
+
     public User findExistingUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException(ErrorCode.INVALID_EMAIL_OR_PASSWORD));
     }
