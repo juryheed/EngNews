@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface KeywordRepository extends JpaRepository<Keyword, UUID> {
     List<Keyword> findAllByCategory(Category category);
     Optional<Keyword> findById(UUID id);
+    List<Keyword> findAllByCategoryIn(List<Category> categories);
 }
