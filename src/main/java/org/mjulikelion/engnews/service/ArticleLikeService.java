@@ -52,7 +52,6 @@ public class ArticleLikeService {
             title = doc.select("meta[property=og:title]").attr("content");
             imageUrl = doc.select("meta[property=og:image]").attr("content");
 
-//            content = doc.select("div.article-body").text();
             content = doc.select("article#dic_area.go_trans._article_content").text();
             if (content.isEmpty()) {
                 content = doc.select("p").text();

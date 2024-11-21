@@ -12,6 +12,7 @@ public enum ErrorCode {
     COOKIE_NOT_FOUND("4011", "쿠키를 찾을 수 없습니다."),
     INVALID_TOKEN("4012", "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN("4013", "만료된 토큰입니다."),
+    INVALID_ARTICLE("4014", "뉴스 기사를 불러 올 수 없습니다."),
 
     //ForbiddenException
     NO_ACCESS("4030", "접근 권한이 없습니다."),
