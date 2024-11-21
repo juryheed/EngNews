@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
 import org.mjulikelion.engnews.dto.request.category.CategoryListDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
-import org.mjulikelion.engnews.dto.response.category.NaverCategoryListResponseDto;
+import org.mjulikelion.engnews.dto.response.category.CategoryListResponseDto;
 import org.mjulikelion.engnews.dto.response.category.UserCategoryListResponseDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.CategoryService;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -23,10 +22,10 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/naver")
-    public ResponseEntity<ResponseDto<NaverCategoryListResponseDto>> getNaverCategories() throws IOException {
-        NaverCategoryListResponseDto categories = categoryService.getAllNaverCategories();
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "네이버 카테고리 리스트 조회 완료", categories), HttpStatus.OK);
+    @GetMapping("/news")
+    public ResponseEntity<ResponseDto<CategoryListResponseDto>> getAllCategories(){
+        CategoryListResponseDto categories = categoryService.getAllCategories();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "카테고리 리스트 조회 완료", categories), HttpStatus.OK);
     }
 
     @PostMapping

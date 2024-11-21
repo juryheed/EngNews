@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 @Builder
-public class NaverCategoryListResponseDto {
+public class CategoryListResponseDto {
     private List<String> categories;
 
-    public static NaverCategoryListResponseDto from(List<String> categories){
-        return NaverCategoryListResponseDto.builder()
+    public static CategoryListResponseDto from(List<String> categories){
+        return CategoryListResponseDto.builder()
                 .categories(categories)
                 .build();
     }
