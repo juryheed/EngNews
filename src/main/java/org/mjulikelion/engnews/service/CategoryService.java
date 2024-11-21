@@ -2,10 +2,6 @@ package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.mjulikelion.engnews.dto.request.category.CategoryListDto;
 import org.mjulikelion.engnews.dto.response.category.CategoryListResponseDto;
 import org.mjulikelion.engnews.dto.response.category.UserCategoryListResponseDto;
@@ -17,8 +13,6 @@ import org.mjulikelion.engnews.exception.NotFoundException;
 import org.mjulikelion.engnews.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
