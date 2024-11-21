@@ -3,8 +3,10 @@ package org.mjulikelion.engnews.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
+import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.request.article.CategoryRequestDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
+import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.NaverNewsService;
@@ -32,4 +34,9 @@ public class NaverNewsController {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, categoryRequestDto.getCategory()+" 카테고리 기사 목록 조회 성공", articles));
     }
 
+    @PostMapping
+    public ResponseEntity<ResponseDto<ArticleDto>> getNews(@RequestBody @Valid ArticleRequestDto articleRequestDto) {
+        ArticleDto article=naverNewsService.getArticle(articleRequestDto);
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 단건 조회 성공", article));
+    }
 }
