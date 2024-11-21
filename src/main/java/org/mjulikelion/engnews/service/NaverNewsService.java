@@ -7,6 +7,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
+import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
@@ -43,6 +45,8 @@ public class NaverNewsService {
 
     private final KeywordRepository keywordRepository;
     private final CategoryRepository categoryRepository;
+
+    private final ArticleLikeService articleLikeService;
 
     //키워드로 네이버 뉴스 크롤링하기
     public List<CategoryArticleDto> getNewsByKeyword(User user) {
@@ -152,5 +156,18 @@ public class NaverNewsService {
             throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
         }
         return articles;
+    }
+
+
+    //네이버 뉴스 단건 조회
+    public ArticleDto getArticle(ArticleRequestDto articleRequestDto) {
+        String url = articleRequestDto.getUrl();
+        String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
+
+        return ArticleDto.from(
+                article[0],
+                article[1],
+                article[2]
+        );
     }
 }
