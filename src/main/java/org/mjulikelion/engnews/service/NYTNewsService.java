@@ -27,7 +27,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class NYTService {
+public class NYTNewsService {
 
     @Value("${nyt.client.key}")
     private String clientId;
