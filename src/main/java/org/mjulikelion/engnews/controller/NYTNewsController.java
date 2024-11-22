@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/news/nyt")
-public class NYTController {
+public class NYTNewsController {
 
     private final NYTService nytService;
 
