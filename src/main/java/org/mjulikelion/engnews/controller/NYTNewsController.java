@@ -8,7 +8,7 @@ import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.User;
-import org.mjulikelion.engnews.service.NYTService;
+import org.mjulikelion.engnews.service.NYTNewsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/news/nyt")
 public class NYTNewsController {
 
-    private final NYTService nytService;
+    private final NYTNewsService nytService;
 
     @GetMapping("/keyword")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTNewsByKeyword(@AuthenticatedUser User user) {
