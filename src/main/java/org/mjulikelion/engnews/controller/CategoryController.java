@@ -25,7 +25,7 @@ public class CategoryController {
     @GetMapping("/news")
     public ResponseEntity<ResponseDto<CategoryListResponseDto>> getAllCategories(){
         CategoryListResponseDto categories = categoryService.getAllCategories();
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "카테고리 리스트 조회 완료", categories), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "뉴스 카테고리 리스트 조회 완료", categories), HttpStatus.OK);
     }
 
     @PostMapping
