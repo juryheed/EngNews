@@ -62,7 +62,7 @@ public class NaverNewsService {
             StringBuffer sb = new StringBuffer();
             sb.append("https://openapi.naver.com/v1/search/news.json?query=");
             sb.append(keywordName);
-            sb.append("&display=2&start=1&sort=sim");
+            sb.append("&display=10&start=1&sort=sim");
             String url = sb.toString();
 
             // 헤더 설정
