@@ -28,8 +28,8 @@ public class NaverNewsController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNewsByCategory(@RequestParam String category) {
-        List<CategoryArticleDto> articles = naverNewsService.getArticlesByCategory(category);
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNewsByCategory(@RequestParam String category, @RequestParam int page) {
+        List<CategoryArticleDto> articles = naverNewsService.getArticlesByCategory(category, page);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 기사 목록 조회 성공", articles));
     }
 
