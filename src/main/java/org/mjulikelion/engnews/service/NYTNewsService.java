@@ -72,12 +72,12 @@ public class NYTNewsService {
         return allArticles;
     }
 
-    // 카테고리로 NYT 뉴스 조회
-    public List<CategoryArticleDto> getNYTByCategory(String category) {
+    public List<CategoryArticleDto> getNYTByCategory(String category, int page) {
         String filter = "news_desk:(" + category + ")";
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
                 + "?fq=" + filter
-                + "&api-key=" + clientId;
+                + "&api-key=" + clientId
+                + "&page=" + (page - 1); // NYT API는 페이지 번호가 0부터 시작
 
         List<CategoryArticleDto> articles = new ArrayList<>();
 
@@ -92,6 +92,7 @@ public class NYTNewsService {
                 String title = article.path("headline").path("main").asText();
                 String link = article.path("web_url").asText();
                 String imageUrl = crawlImageUrlFromArticle(link);
+
                 articles.add(CategoryArticleDto.from(title, link, imageUrl));
             }
         } catch (IOException e) {
@@ -99,6 +100,7 @@ public class NYTNewsService {
         }
         return articles;
     }
+
 
     // 단건 기사 조회
     public ArticleDto getNYTNews(ArticleRequestDto articleRequestDto) {
