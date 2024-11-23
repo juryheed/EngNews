@@ -22,6 +22,10 @@ public class Category extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CategoryType category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_options_id", nullable = false)
+    private CategoryOptions categoryOptions;
+
     //유저와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)

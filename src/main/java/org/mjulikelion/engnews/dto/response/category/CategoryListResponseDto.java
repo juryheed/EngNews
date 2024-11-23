@@ -8,9 +8,9 @@ import java.util.List;
 @Getter
 @Builder
 public class CategoryListResponseDto {
-    private List<String> categories;
+    private List<CategoryResponseDto> categories;
 
-    public static CategoryListResponseDto from(List<String> categories){
+    public static CategoryListResponseDto from(List<CategoryResponseDto> categories){
         return CategoryListResponseDto.builder()
                 .categories(categories)
                 .build();
