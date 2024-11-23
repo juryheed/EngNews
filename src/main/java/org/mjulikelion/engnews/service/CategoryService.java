@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mjulikelion.engnews.dto.request.category.CategoryListDto;
 import org.mjulikelion.engnews.dto.response.category.CategoryListResponseDto;
+import org.mjulikelion.engnews.dto.response.category.CategoryResponseDto;
 import org.mjulikelion.engnews.dto.response.category.UserCategoryListResponseDto;
 import org.mjulikelion.engnews.entity.Category;
+import org.mjulikelion.engnews.entity.CategoryOptions;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.entity.type.CategoryType;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.NotFoundException;
+import org.mjulikelion.engnews.repository.CategoryOptionsRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,23 +27,38 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryOptionsRepository categoryOptionsRepository;
 
     public CategoryListResponseDto getAllCategories() {
-        List<String> categories = Arrays.stream(CategoryType.values())
-                .map(Enum::name)
+        List<CategoryResponseDto> categoryList = Arrays.stream(CategoryType.values())
+                .map(categoryType -> {
+                    CategoryOptions categoryOptions = categoryOptionsRepository.findByCategoryType(categoryType)
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+
+                    CategoryResponseDto categoryResponseDto = CategoryResponseDto.builder()
+                            .id(categoryOptions.getId())
+                            .category(categoryType)
+                            .build();
+                    return categoryResponseDto;
+                })
                 .collect(Collectors.toList());
-        return CategoryListResponseDto.from(categories);
+
+        return CategoryListResponseDto.from(categoryList);
     }
 
-    public void saveCategories(User user, CategoryListDto categories) {
-        for (String category : categories.getCategories()) {
-            CategoryType categoryType = isValidCategory(category);
-            Category newCategory = Category.builder()
-                    .category(categoryType)
-                    .user(user)
-                    .build();
-            categoryRepository.save(newCategory);
-        }
+    public void saveCategories(User user, CategoryListDto categoryDto) {
+        CategoryType categoryType = isValidCategory(categoryDto.getCategory());
+
+        CategoryOptions categoryOptions = categoryOptionsRepository.findByCategoryType(categoryType)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        Category newCategory = Category.builder()
+                .category(categoryType)
+                .user(user)
+                .categoryOptions(categoryOptions)
+                .build();
+
+        categoryRepository.save(newCategory);
     }
 
     private CategoryType isValidCategory(String category) {
