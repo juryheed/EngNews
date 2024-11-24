@@ -28,15 +28,15 @@ public class NYTNewsController {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, " 키워드로 NYT 기사 목록 조회 성공", articles));
     }
 
-    @GetMapping
+    @GetMapping("/categories")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTByCategory(@RequestParam String category, @RequestParam int page) {
         List<CategoryArticleDto> articles = nytService.getNYTByCategory(category, page);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 NYT 기사 목록 조회 성공", articles));
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseDto<ArticleDto>> getNYTNews(@RequestBody @Valid ArticleRequestDto articleRequestDto) {
-        ArticleDto article=nytService.getNYTNews(articleRequestDto);
+    @GetMapping
+    public ResponseEntity<ResponseDto<ArticleDto>> getNYTNews(@RequestParam String url) {
+        ArticleDto article=nytService.getNYTNews(url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 기사 단건 조회 성공", article));
     }
 
