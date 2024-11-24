@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,20 +30,31 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryOptionsRepository categoryOptionsRepository;
 
-    public CategoryListResponseDto getAllCategories() {
+    public CategoryListResponseDto getNaverCategories() {
+        return getCategoriesByNews("naver");
+    }
+
+    public CategoryListResponseDto getNytCategories() {
+        return getCategoriesByNews("nyt");
+    }
+
+    public CategoryListResponseDto getCategoriesByNews(String news) {
         List<CategoryResponseDto> categoryList = Arrays.stream(CategoryType.values())
                 .map(categoryType -> {
                     CategoryOptions categoryOptions = categoryOptionsRepository.findByCategoryType(categoryType)
                             .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-                    CategoryResponseDto categoryResponseDto = CategoryResponseDto.builder()
+                    if (!news.equalsIgnoreCase(categoryOptions.getNews())) {
+                        return null;
+                    }
+
+                    return CategoryResponseDto.builder()
                             .id(categoryOptions.getId())
                             .category(categoryType)
                             .build();
-                    return categoryResponseDto;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-
         return CategoryListResponseDto.from(categoryList);
     }
 
