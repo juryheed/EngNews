@@ -27,15 +27,15 @@ public class NaverNewsController {
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, " 키워드로 기사 목록 조회 성공", articles));
     }
 
-    @GetMapping
+    @GetMapping("/categories")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNewsByCategory(@RequestParam String category, @RequestParam int page) {
         List<CategoryArticleDto> articles = naverNewsService.getArticlesByCategory(category, page);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 기사 목록 조회 성공", articles));
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseDto<ArticleDto>> getNews(@RequestBody @Valid ArticleRequestDto articleRequestDto) {
-        ArticleDto article=naverNewsService.getArticle(articleRequestDto);
+    @GetMapping
+    public ResponseEntity<ResponseDto<ArticleDto>> getNews(@RequestParam String url) {
+        ArticleDto article=naverNewsService.getArticle(url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 단건 조회 성공", article));
     }
 
