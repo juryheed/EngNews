@@ -39,4 +39,10 @@ public class NYTNewsController {
         ArticleDto article=nytService.getNYTNews(articleRequestDto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 기사 단건 조회 성공", article));
     }
+
+    @GetMapping("/top5")
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getTop5NYTNews() {
+        List<CategoryArticleDto> articles = nytService.getTop5NYTNews();
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 뉴스 top5 목록 조회 성공", articles));
+    }
 }
