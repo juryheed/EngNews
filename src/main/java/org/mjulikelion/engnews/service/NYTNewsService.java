@@ -103,8 +103,7 @@ public class NYTNewsService {
 
 
     // 단건 기사 조회
-    public ArticleDto getNYTNews(ArticleRequestDto articleRequestDto) {
-        String url = articleRequestDto.getUrl();
+    public ArticleDto getNYTNews(String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
 
         return ArticleDto.from(
