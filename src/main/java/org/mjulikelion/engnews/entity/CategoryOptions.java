@@ -17,4 +17,7 @@ public class CategoryOptions extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
+
+    @Column(nullable = false)
+    private String news;
 }
