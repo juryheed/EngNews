@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
 import org.mjulikelion.engnews.dto.request.keyword.KeywordDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
-import org.mjulikelion.engnews.dto.response.keyword.KeywordsListResponseDto;
+import org.mjulikelion.engnews.dto.response.keyword.CategoryKeywordListResponseDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.KeywordService;
 import org.springframework.http.HttpStatus;
@@ -31,8 +31,8 @@ public class keywordController {
 
     //특정 카테고리와 관련된 키워드 전체 조회 컨트롤러
     @GetMapping("/{categoryId}")
-    public ResponseEntity<ResponseDto<KeywordsListResponseDto>> getKeyword(@AuthenticatedUser User user,@PathVariable UUID categoryId){
-        KeywordsListResponseDto keywords=keywordService.getKeyword(user,categoryId);
+    public ResponseEntity<ResponseDto<CategoryKeywordListResponseDto>> getKeyword(@AuthenticatedUser User user,@PathVariable UUID categoryId){
+        CategoryKeywordListResponseDto keywords=keywordService.getKeyword(user,categoryId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "키워드 조회 완료",keywords), HttpStatus.OK);
     }
 
