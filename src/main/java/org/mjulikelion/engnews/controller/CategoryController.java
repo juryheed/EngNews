@@ -22,10 +22,16 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/news")
-    public ResponseEntity<ResponseDto<CategoryListResponseDto>> getAllCategories(){
-        CategoryListResponseDto categories = categoryService.getAllCategories();
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "뉴스 카테고리 리스트 조회 완료", categories), HttpStatus.OK);
+    @GetMapping("/naver")
+    public ResponseEntity<ResponseDto<CategoryListResponseDto>> getNaverCategories(){
+        CategoryListResponseDto categories = categoryService.getNaverCategories();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "네이버 뉴스 카테고리 리스트 조회 완료", categories), HttpStatus.OK);
+    }
+
+    @GetMapping("/nyt")
+    public ResponseEntity<ResponseDto<CategoryListResponseDto>> getNytCategories(){
+        CategoryListResponseDto categories = categoryService.getNytCategories();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "NYT 뉴스 카테고리 리스트 조회 완료", categories), HttpStatus.OK);
     }
 
     @PostMapping
