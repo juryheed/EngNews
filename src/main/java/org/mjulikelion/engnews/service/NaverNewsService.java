@@ -171,4 +171,39 @@ public class NaverNewsService {
                 article[2]
         );
     }
+
+    // 네이버 뉴스 top5 조회하기
+    public List<CategoryArticleDto> getTop5NaverNews() {
+        String url = "https://news.naver.com/main/ranking/popularDay.naver";
+        List<CategoryArticleDto> topRankingArticles = new ArrayList<>();
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            Element firstRankingBox = doc.select(".rankingnews_box").first();   // 첫 번째 언론사의 top5 크롤링
+
+            if (firstRankingBox != null) {
+                Elements rankingArticles = firstRankingBox.select(".rankingnews_list li");
+
+                for (int i = 0; i < Math.min(5, rankingArticles.size()); i++) {
+                    Element articleElement = rankingArticles.get(i);
+                    String title = articleElement.select(".list_title").text();
+                    String link = articleElement.select("a").attr("href");
+
+                    if (!link.startsWith("http")) {
+                        link = "https://news.naver.com" + link;
+                    }
+
+                    String imageUrl = crawlImageUrlFromArticle(link);
+                    topRankingArticles.add(CategoryArticleDto.from(title, link, imageUrl));
+                }
+            } else {
+                System.err.println("첫 번째 rankingnews_box를 찾을 수 없습니다.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("네이버 뉴스 랭킹 크롤링 실패");
+        }
+        return topRankingArticles;
+    }
 }

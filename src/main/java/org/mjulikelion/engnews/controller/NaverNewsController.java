@@ -38,4 +38,10 @@ public class NaverNewsController {
         ArticleDto article=naverNewsService.getArticle(articleRequestDto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 단건 조회 성공", article));
     }
+
+    @GetMapping("/top5")
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getTop5NaverNews() {
+        List<CategoryArticleDto> articles = naverNewsService.getTop5NaverNews();
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "네이버 뉴스 top5 목록 조회 성공", articles));
+    }
 }
