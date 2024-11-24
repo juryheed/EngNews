@@ -128,4 +128,33 @@ public class NYTNewsService {
             return "https://via.placeholder.com/150";
         }
     }
+
+    // NYT 뉴스 top5 조회하기
+    public List<CategoryArticleDto> getTop5NYTNews() {
+        String url = "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=" + clientId;
+        List<CategoryArticleDto> top5Articles = new ArrayList<>();
+
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode articlesNode = rootNode.path("results");
+
+            for (int i = 0; i < Math.min(5, articlesNode.size()); i++) {
+                JsonNode article = articlesNode.get(i);
+
+                String title = article.path("title").asText();
+                String link = article.path("url").asText();
+                String imageUrl = crawlImageUrlFromArticle(link);
+
+                top5Articles.add(CategoryArticleDto.from(title, link, imageUrl));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
+        }
+        return top5Articles;
+    }
+
 }
