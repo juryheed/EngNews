@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
+import org.mjulikelion.engnews.dto.response.article.RelatedArticleDto;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
 import org.mjulikelion.engnews.entity.User;
@@ -99,29 +100,7 @@ public class NaverNewsService {
         return allArticles;
     }
 
-    public String crawlImageUrlFromArticle(String articleLink) {
-        try {
-            // 기사 페이지로 HTTP 요청 보내기
-            Document doc = Jsoup.connect(articleLink).get();
-
-            // 이미지 URL을 추출할 수 있는 부분을 찾기
-            Elements metaTags = doc.select("meta[property=og:image]");
-
-            // 첫 번째 <meta> 태그에서 'content' 속성값을 가져옴 (대표 이미지 URL)
-            if (!metaTags.isEmpty()) {
-                String imageUrl = metaTags.first().attr("content");
-                return imageUrl;
-            } else {
-                // 대표 이미지가 없으면, 기본 이미지 URL을 반환
-                return "https://via.placeholder.com/150"; // 기본 이미지
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "https://via.placeholder.com/150"; // 오류 발생 시 기본 이미지
-        }
-    }
-
-
+    // 카테고리로 네이버 뉴스 가져오기
     public List<CategoryArticleDto> getArticlesByCategory(String category, int page) {
         int display = 10;
         int start = (page - 1) * display + 1;
@@ -171,6 +150,29 @@ public class NaverNewsService {
         );
     }
 
+    // 관련 기사 목록 조회하기
+    public List<RelatedArticleDto> getRelatedArticles(String articleUrl) {
+        List<RelatedArticleDto> relatedArticles = new ArrayList<>();
+        try {
+            Document doc = Jsoup.connect(articleUrl).get();
+            Elements relatedNewsElements = doc.select("ul.ofhe_list li");
+            for (Element element : relatedNewsElements) {
+                String relatedTitle = element.text();
+                String relatedLink = element.attr("href");
+                if (!relatedLink.startsWith("http")) {
+                    relatedLink = "https://news.naver.com" + relatedLink;
+                }
+                String imageUrl = crawlImageUrlFromArticle(relatedLink);
+                relatedArticles.add(RelatedArticleDto.from(relatedTitle, relatedLink, imageUrl));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("관련 뉴스 크롤링 실패: " + e.getMessage());
+        }
+        return relatedArticles;
+    }
+
+
     // 네이버 뉴스 top5 조회하기
     public List<CategoryArticleDto> getTop5NaverNews() {
         String url = "https://news.naver.com/main/ranking/popularDay.naver";
@@ -204,5 +206,28 @@ public class NaverNewsService {
             throw new RuntimeException("네이버 뉴스 랭킹 크롤링 실패");
         }
         return topRankingArticles;
+    }
+
+
+    public String crawlImageUrlFromArticle(String articleLink) {
+        try {
+            // 기사 페이지로 HTTP 요청 보내기
+            Document doc = Jsoup.connect(articleLink).get();
+
+            // 이미지 URL을 추출할 수 있는 부분을 찾기
+            Elements metaTags = doc.select("meta[property=og:image]");
+
+            // 첫 번째 <meta> 태그에서 'content' 속성값을 가져옴 (대표 이미지 URL)
+            if (!metaTags.isEmpty()) {
+                String imageUrl = metaTags.first().attr("content");
+                return imageUrl;
+            } else {
+                // 대표 이미지가 없으면, 기본 이미지 URL을 반환
+                return "https://via.placeholder.com/150"; // 기본 이미지
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "https://via.placeholder.com/150"; // 오류 발생 시 기본 이미지
+        }
     }
 }
