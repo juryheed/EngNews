@@ -7,6 +7,7 @@ import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
+import org.mjulikelion.engnews.dto.response.article.RelatedArticleDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.NaverNewsService;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,12 @@ public class NaverNewsController {
     public ResponseEntity<ResponseDto<ArticleDto>> getNews(@RequestParam String url) {
         ArticleDto article=naverNewsService.getArticle(url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 단건 조회 성공", article));
+    }
+
+    @GetMapping("/related-articles")
+    public ResponseEntity<ResponseDto<List<RelatedArticleDto>>> getNewsByRe(@RequestParam String url) {
+        List<RelatedArticleDto> articles = naverNewsService.getRelatedArticles(url);
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "관련 기사 조회 성공",articles));
     }
 
     @GetMapping("/top5")
