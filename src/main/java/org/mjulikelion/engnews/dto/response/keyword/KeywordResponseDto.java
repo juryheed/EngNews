@@ -3,6 +3,7 @@ package org.mjulikelion.engnews.dto.response.keyword;
 import lombok.Builder;
 import lombok.Getter;
 import org.mjulikelion.engnews.entity.Keyword;
+import org.mjulikelion.engnews.entity.type.CategoryType;
 
 import java.util.UUID;
 
