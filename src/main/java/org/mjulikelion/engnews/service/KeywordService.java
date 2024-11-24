@@ -3,7 +3,7 @@ package org.mjulikelion.engnews.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mjulikelion.engnews.dto.request.keyword.KeywordDto;
-import org.mjulikelion.engnews.dto.response.keyword.KeywordsListResponseDto;
+import org.mjulikelion.engnews.dto.response.keyword.CategoryKeywordListResponseDto;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
 import org.mjulikelion.engnews.entity.User;
@@ -36,13 +36,13 @@ public class KeywordService {
         keywordRepository.save(keyword);
     }
 
-    public KeywordsListResponseDto getKeyword(User user, UUID categoryId){
+    public CategoryKeywordListResponseDto getKeyword(User user, UUID categoryId){
         Category category = categoryRepository.findByUserAndId(user,categoryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         List<Keyword> keywords = keywordRepository.findAllByCategory(category);
 
-        return KeywordsListResponseDto.from(keywords);
+        return CategoryKeywordListResponseDto.from(keywords);
     }
 
     public void deleteKeyword(User user, UUID keywordId) {
