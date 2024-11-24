@@ -161,8 +161,7 @@ public class NaverNewsService {
 
 
     //네이버 뉴스 단건 조회
-    public ArticleDto getArticle(ArticleRequestDto articleRequestDto) {
-        String url = articleRequestDto.getUrl();
+    public ArticleDto getArticle(String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
 
         return ArticleDto.from(
