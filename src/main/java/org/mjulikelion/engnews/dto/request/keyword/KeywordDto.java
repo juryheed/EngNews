@@ -16,6 +16,6 @@ public class KeywordDto {
     @NotNull(message = "관련 카테고리를 입력해 주세요")
     private UUID categoryId;
 
-    @NotEmpty(message = "키워드를 입력해주세요.")
-    private String keyword;
+    @NotNull(message = "키워드를 입력해주세요.")
+    private UUID keywordId;
 }
