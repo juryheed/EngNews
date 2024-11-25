@@ -141,13 +141,36 @@ public class NaverNewsService {
     //네이버 뉴스 단건 조회
     public ArticleDto getArticle(String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
-
+        String[] article2 = getTimeAndJournalistNameFromUrl(url);
         return ArticleDto.from(
                 article[0],
                 article[1],
-                article[2]
+                article[2],
+                article2[0],
+                article2[1]
         );
     }
+
+    protected String[] getTimeAndJournalistNameFromUrl(String url) {
+        String time = "";
+        String journalistName = "";
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            time = doc.select("span.media_end_head_info_datestamp_time").attr("data-date-time");
+            journalistName = String.valueOf(doc.selectFirst("em.media_end_head_journalist_name"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        journalistName=journalistName.replaceAll("<[^>]*>", "").trim();
+
+        return new String[] { time, journalistName};
+    }
+
+
 
     // 관련 기사 목록 조회하기
     public List<RelatedArticleDto> getRelatedArticles(String articleUrl) {
