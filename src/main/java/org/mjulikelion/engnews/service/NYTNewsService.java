@@ -45,7 +45,7 @@ public class NYTNewsService {
         List<CategoryArticleDto> allArticles = new ArrayList<>();
 
         for (Keyword keyword : keywords) {
-            String keywordName = keyword.getKeyword();
+            String keywordName = keyword.getKeywordOptions().getKeywordName();
 
             String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
                     + "?q=" + keywordName
