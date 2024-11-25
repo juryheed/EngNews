@@ -14,11 +14,15 @@ import lombok.NoArgsConstructor;
 @Table(name = "keyword")
 public class Keyword extends BaseEntity {
 
-    @Column(nullable = false)
-    private String keyword;
-
-    //카테고리와 관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categories_id")
+    @JoinColumn(name = "keyword_options_id", nullable = false)
+    private KeywordOptions keywordOptions;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categories_id", nullable = false)
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id",nullable = false)
+    private User user;
 }
