@@ -7,6 +7,7 @@ import org.mjulikelion.engnews.authentication.AuthenticatedUser;
 import org.mjulikelion.engnews.dto.request.keyword.KeywordDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.keyword.CategoryKeywordListResponseDto;
+import org.mjulikelion.engnews.dto.response.keyword.KeywordOptionListResponseDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.KeywordService;
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,23 @@ public class keywordController {
 
     private final KeywordService keywordService;
 
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<ResponseDto<KeywordOptionListResponseDto>> getAllKeywords(@PathVariable UUID categoryId){
+        KeywordOptionListResponseDto keywordOptions = keywordService.getAllKeywords(categoryId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "키워드 조회 완료", keywordOptions), HttpStatus.OK);
+    }
+
     //키워드 단건 추가 컨트롤러
     @PostMapping
     public ResponseEntity<ResponseDto<Void>> saveKeyword(@AuthenticatedUser User user, @RequestBody @Valid KeywordDto keyword) {
-        keywordService.saveKeyword(user,keyword);
+        keywordService.saveKeyword(user, keyword);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "키워드 저장 완료"), HttpStatus.CREATED);
     }
 
     //특정 카테고리와 관련된 키워드 전체 조회 컨트롤러
-    @GetMapping("/{categoryId}")
+    @GetMapping("/user/{categoryId}")
     public ResponseEntity<ResponseDto<CategoryKeywordListResponseDto>> getKeyword(@AuthenticatedUser User user,@PathVariable UUID categoryId){
-        CategoryKeywordListResponseDto keywords=keywordService.getKeyword(user,categoryId);
+        CategoryKeywordListResponseDto keywords = keywordService.getKeyword(user,categoryId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "키워드 조회 완료",keywords), HttpStatus.OK);
     }
 
