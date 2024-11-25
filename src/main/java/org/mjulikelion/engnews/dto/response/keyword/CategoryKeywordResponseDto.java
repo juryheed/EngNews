@@ -19,9 +19,9 @@ public class CategoryKeywordResponseDto {
 
     public static  CategoryKeywordResponseDto from(Keyword keyword){
         return CategoryKeywordResponseDto.builder()
-                .categoryOption(keyword.getCategory().getCategoryOptions().getCategoryType())    //카테고리옵션 아이디
-                .userCategoryId(keyword.getCategory().getId())  //유저가 설정한 키워드
-                .keyword(keyword.getKeyword())  //키워드 이름
+                .categoryOption(keyword.getKeywordOptions().getCategoryOptions().getCategoryType())    //카테고리옵션 아이디
+                .userCategoryId(keyword.getCategory().getId())  //유저 카테고리 아이디
+                .keyword(keyword.getKeywordOptions().getKeywordName())  //키워드 이름
                 .keywordId(keyword.getId())    //키워드 아이디
                 .build();
     }
