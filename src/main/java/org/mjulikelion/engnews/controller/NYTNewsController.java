@@ -1,9 +1,7 @@
 package org.mjulikelion.engnews.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
@@ -35,8 +33,8 @@ public class NYTNewsController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDto<ArticleDto>> getNYTNews(@RequestParam String url) {
-        ArticleDto article=nytService.getNYTNews(url);
+    public ResponseEntity<ResponseDto<ArticleDto>> getNYTNews(@AuthenticatedUser User user,@RequestParam String url) {
+        ArticleDto article=nytService.getNYTNews(user, url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 기사 단건 조회 성공", article));
     }
 

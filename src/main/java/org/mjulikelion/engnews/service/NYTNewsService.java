@@ -8,11 +8,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
+import org.mjulikelion.engnews.entity.ArticleLike;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.UnauthorizedException;
+import org.mjulikelion.engnews.repository.ArticleLikeRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
 import org.mjulikelion.engnews.repository.KeywordRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +39,7 @@ public class NYTNewsService {
     private final CategoryRepository categoryRepository;
     private final ArticleLikeService articleLikeService;
     private final NaverNewsService naverNewsService;
+    private final ArticleLikeRepository articleLikeRepository;
 
     // 키워드로 NYT 뉴스 조회
     public List<CategoryArticleDto> getNYTNewsByKeyword(User user) {
@@ -103,15 +107,29 @@ public class NYTNewsService {
 
 
     // 단건 기사 조회
-    public ArticleDto getNYTNews(String url) {
+    public ArticleDto getNYTNews(User user,String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
         String[] article2 = naverNewsService.getTimeAndJournalistNameFromUrl(url);
+
+        List<ArticleLike> articleLikes = articleLikeRepository.findAllByUser(user);
+        List<String> urls = new ArrayList<>();
+
+        // for 루프를 사용하여 각 ArticleLike의 original_url을 추출
+        for (ArticleLike articleLike : articleLikes) {
+            urls.add(articleLike.getOriginal_url());
+        }
+
+        boolean isArticleLike = urls.contains(url);
+
+        System.out.print(urls);
+
         return ArticleDto.from(
                 article[0],
                 article[1],
                 article[2],
                 article2[0],
                 article2[1]
+                ,isArticleLike
         );
     }
 
