@@ -7,16 +7,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.dto.response.article.RelatedArticleDto;
-import org.mjulikelion.engnews.entity.Category;
-import org.mjulikelion.engnews.entity.Keyword;
-import org.mjulikelion.engnews.entity.User;
+import org.mjulikelion.engnews.entity.*;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.UnauthorizedException;
 import org.mjulikelion.engnews.repository.CategoryRepository;
+import org.mjulikelion.engnews.repository.KeywordOptionsRepository;
 import org.mjulikelion.engnews.repository.KeywordRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class NaverNewsService {
 
     private final KeywordRepository keywordRepository;
     private final CategoryRepository categoryRepository;
-
+    private final KeywordOptionsRepository keywordOptionsRepository;
     private final ArticleLikeService articleLikeService;
 
     //키워드로 네이버 뉴스 크롤링하기
@@ -57,7 +56,7 @@ public class NaverNewsService {
         List<CategoryArticleDto> allArticles = new ArrayList<>();
 
         for (Keyword keyword : keywords) {
-            String keywordName = keyword.getKeyword();
+            String keywordName = keyword.getKeywordOptions().getKeywordName();
 
             // URI 생성
             StringBuffer sb = new StringBuffer();

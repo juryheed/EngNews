@@ -31,9 +31,7 @@ public class Category extends BaseEntity {
     @JoinColumn(name="user_id",nullable = false)
     private User user;
 
-
     //키워드와의 관계
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Keyword> keywords;
-
 }
