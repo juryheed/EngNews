@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.Category;
@@ -36,6 +35,7 @@ public class NYTNewsService {
     private final KeywordRepository keywordRepository;
     private final CategoryRepository categoryRepository;
     private final ArticleLikeService articleLikeService;
+    private final NaverNewsService naverNewsService;
 
     // 키워드로 NYT 뉴스 조회
     public List<CategoryArticleDto> getNYTNewsByKeyword(User user) {
@@ -105,13 +105,16 @@ public class NYTNewsService {
     // 단건 기사 조회
     public ArticleDto getNYTNews(String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
-
+        String[] article2 = naverNewsService.getTimeAndJournalistNameFromUrl(url);
         return ArticleDto.from(
                 article[0],
                 article[1],
-                article[2]
+                article[2],
+                article2[0],
+                article2[1]
         );
     }
+
 
     private String crawlImageUrlFromArticle(String articleLink) {
         try {
