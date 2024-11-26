@@ -1,9 +1,7 @@
 package org.mjulikelion.engnews.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
@@ -23,14 +21,14 @@ public class NYTNewsController {
     private final NYTNewsService nytService;
 
     @GetMapping("/keyword")
-    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTNewsByKeyword(@AuthenticatedUser User user) {
-        List<CategoryArticleDto> articles = nytService.getNYTNewsByKeyword(user);
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTNewsByKeyword(@AuthenticatedUser User user, @RequestParam String sort) {
+        List<CategoryArticleDto> articles = nytService.getNYTNewsByKeyword(user, sort);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, " 키워드로 NYT 기사 목록 조회 성공", articles));
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTByCategory(@RequestParam String category, @RequestParam int page) {
-        List<CategoryArticleDto> articles = nytService.getNYTByCategory(category, page);
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTByCategory(@RequestParam String category, @RequestParam int page, @RequestParam String sort) {
+        List<CategoryArticleDto> articles = nytService.getNYTByCategory(category, page, sort);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 NYT 기사 목록 조회 성공", articles));
     }
 
