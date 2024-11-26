@@ -2,6 +2,7 @@ package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.PasswordHashEncryption;
+import org.mjulikelion.engnews.dto.request.user.DeleteUserDto;
 import org.mjulikelion.engnews.dto.response.user.MypageDto;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
@@ -35,6 +36,11 @@ public class UserService {
         List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories);
 
         return MypageDto.from(user, keywords, categories);
+    }
+
+    public void deleteUser(User user, DeleteUserDto deleteUserDto) {
+        validateIsPasswordMatches(deleteUserDto.getPassword(), user.getPassword());
+        userRepository.delete(user);
     }
 
     public void validateIsPasswordMatches(String requestedPassword, String userPassword) {
