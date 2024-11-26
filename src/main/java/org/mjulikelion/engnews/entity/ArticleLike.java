@@ -17,6 +17,9 @@ public class ArticleLike extends BaseEntity {
     @Column(nullable = false)
     private String original_url;
 
+    @Column(nullable = false)
+    private String news;
+
     //유저와의 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)

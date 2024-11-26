@@ -21,8 +21,8 @@ public class ArticleLikeService {
 
     private final ArticleLikeRepository articleLikeRepository;
 
-    public ArticleLikeListResponseDto getAllArticleLike(User user) {
-        List<ArticleLike> articleLikes = articleLikeRepository.findAllByUser(user);
+    public ArticleLikeListResponseDto getNaverArticleLikes(User user) {
+        List<ArticleLike> articleLikes = articleLikeRepository.findAllByUserAndNews(user, "naver");
 
         List<ArticleLikeResponseDto> articleLikeDtos = articleLikes.stream()
                 .map(articleLike -> {
@@ -40,6 +40,27 @@ public class ArticleLikeService {
                 .articleLikes(articleLikeDtos)
                 .build();
     }
+
+    public ArticleLikeListResponseDto getNytArticleLikes(User user) {
+        List<ArticleLike> articleLikes = articleLikeRepository.findAllByUserAndNews(user, "nyt");
+
+        List<ArticleLikeResponseDto> articleLikeDtos = articleLikes.stream()
+                .map(articleLike -> {
+                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginal_url());
+                    return ArticleLikeResponseDto.from(
+                            articleLike,
+                            titleAndImageAndContent[0],
+                            titleAndImageAndContent[1],
+                            titleAndImageAndContent[2]
+                    );
+                })
+                .toList();
+
+        return ArticleLikeListResponseDto.builder()
+                .articleLikes(articleLikeDtos)
+                .build();
+    }
+
 
     public String[] getTitleImageAndContentFromUrl(String url) {
         String title = "";
@@ -63,10 +84,11 @@ public class ArticleLikeService {
         return new String[] { title, imageUrl, content };
     }
 
-    public void saveArticleLike(User user, String originalUrl) {
+    public void saveArticleLike(User user, String originalUrl, String news) {
         ArticleLike articleLike = ArticleLike.builder()
                 .user(user)
                 .original_url(originalUrl)
+                .news(news)
                 .build();
         articleLikeRepository.save(articleLike);
     }
