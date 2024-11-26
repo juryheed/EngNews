@@ -49,7 +49,7 @@ public class NaverNewsService {
     private final ArticleLikeService articleLikeService;
 
     //키워드로 네이버 뉴스 크롤링하기
-    public List<CategoryArticleDto> getNewsByKeyword(User user) {
+    public List<CategoryArticleDto> getNewsByKeyword(User user, String sort) {
         List<Category> categories = categoryRepository.findAllByUser(user); // 유저 카테고리 조회
         List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories); // 카테고리별 키워드 조회
 
@@ -62,7 +62,7 @@ public class NaverNewsService {
             StringBuffer sb = new StringBuffer();
             sb.append("https://openapi.naver.com/v1/search/news.json?query=");
             sb.append(keywordName);
-            sb.append("&display=10&start=1&sort=sim");
+            sb.append("&display=10&start=1&sort=").append(sort);
             String url = sb.toString();
 
             // 헤더 설정
@@ -100,14 +100,14 @@ public class NaverNewsService {
     }
 
     // 카테고리로 네이버 뉴스 가져오기
-    public List<CategoryArticleDto> getArticlesByCategory(String category, int page) {
+    public List<CategoryArticleDto> getArticlesByCategory(String category, int page, String sort) {
         int display = 10;
         int start = (page - 1) * display + 1;
 
         String url = "https://openapi.naver.com/v1/search/news.json?query=" + category
                 + "&display=" + display
                 + "&start=" + start
-                + "&sort=date";
+                + "&sort=" + sort;
 
         List<CategoryArticleDto> articles = new ArrayList<>();
 
