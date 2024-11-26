@@ -3,7 +3,7 @@ package org.mjulikelion.engnews.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.request.articleLike.ArticleLikeUrlDto;
+import org.mjulikelion.engnews.dto.request.articleLike.ArticleLikeDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.articleLike.ArticleLikeListResponseDto;
 import org.mjulikelion.engnews.entity.User;
@@ -35,8 +35,8 @@ public class ArticleLikeController {
 
     @PostMapping
     public ResponseEntity<ResponseDto<Void>> saveArticleLike(@AuthenticatedUser User user,
-                                                             @RequestBody @Valid ArticleLikeUrlDto articleLikeUrlDto) {
-        articleLikeService.saveArticleLike(user, articleLikeUrlDto.getOriginalUrl(), articleLikeUrlDto.getNews());
+                                                             @RequestBody @Valid ArticleLikeDto articleLikeDto) {
+        articleLikeService.saveArticleLike(user, articleLikeDto.getOriginalUrl(), articleLikeDto.getNews());
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "기사 찜하기 완료"), HttpStatus.CREATED);
     }
 
