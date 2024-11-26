@@ -9,6 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ArticleLikeRepository extends JpaRepository<ArticleLike, UUID> {
-    List<ArticleLike> findAllByUser(User user);
     Optional<ArticleLike> findByUserAndId(User user, UUID articleLikeId);
+    List<ArticleLike> findAllByUserAndNews(User user, String news);
 }
