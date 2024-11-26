@@ -13,6 +13,7 @@ import org.mjulikelion.engnews.dto.response.article.RelatedArticleDto;
 import org.mjulikelion.engnews.entity.*;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.UnauthorizedException;
+import org.mjulikelion.engnews.repository.ArticleLikeRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
 import org.mjulikelion.engnews.repository.KeywordOptionsRepository;
 import org.mjulikelion.engnews.repository.KeywordRepository;
@@ -27,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,9 +49,10 @@ public class NaverNewsService {
     private final CategoryRepository categoryRepository;
     private final KeywordOptionsRepository keywordOptionsRepository;
     private final ArticleLikeService articleLikeService;
+    private final ArticleLikeRepository articleLikeRepository;
 
     //키워드로 네이버 뉴스 크롤링하기
-    public List<CategoryArticleDto> getNewsByKeyword(User user) {
+    public List<CategoryArticleDto> getNewsByKeyword(User user, String sort) {
         List<Category> categories = categoryRepository.findAllByUser(user); // 유저 카테고리 조회
         List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories); // 카테고리별 키워드 조회
 
@@ -62,7 +65,7 @@ public class NaverNewsService {
             StringBuffer sb = new StringBuffer();
             sb.append("https://openapi.naver.com/v1/search/news.json?query=");
             sb.append(keywordName);
-            sb.append("&display=10&start=1&sort=sim");
+            sb.append("&display=10&start=1&sort=").append(sort);
             String url = sb.toString();
 
             // 헤더 설정
@@ -100,14 +103,14 @@ public class NaverNewsService {
     }
 
     // 카테고리로 네이버 뉴스 가져오기
-    public List<CategoryArticleDto> getArticlesByCategory(String category, int page) {
+    public List<CategoryArticleDto> getArticlesByCategory(String category, int page, String sort) {
         int display = 10;
         int start = (page - 1) * display + 1;
 
         String url = "https://openapi.naver.com/v1/search/news.json?query=" + category
                 + "&display=" + display
                 + "&start=" + start
-                + "&sort=date";
+                + "&sort=" + sort;
 
         List<CategoryArticleDto> articles = new ArrayList<>();
 
@@ -139,15 +142,52 @@ public class NaverNewsService {
 
 
     //네이버 뉴스 단건 조회
-    public ArticleDto getArticle(String url) {
+    public ArticleDto getArticle(User user, String url) {
         String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
+        String[] article2 = getTimeAndJournalistNameFromUrl(url);
+
+        List<ArticleLike> articleLikes = articleLikeRepository.findAllByUser(user);
+        List<String> urls = new ArrayList<>();
+
+        // for 루프를 사용하여 각 ArticleLike의 original_url을 추출
+        for (ArticleLike articleLike : articleLikes) {
+            urls.add(articleLike.getOriginal_url());
+        }
+
+        boolean isArticleLike = urls.contains(url);
+
+        System.out.print("url:"+urls);
 
         return ArticleDto.from(
                 article[0],
                 article[1],
-                article[2]
+                article[2],
+                article2[0],
+                article2[1],
+                isArticleLike
         );
     }
+
+    protected String[] getTimeAndJournalistNameFromUrl(String url) {
+        String time = "";
+        String journalistName = "";
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+
+            time = doc.select("span.media_end_head_info_datestamp_time").attr("data-date-time");
+            journalistName = String.valueOf(doc.selectFirst("em.media_end_head_journalist_name"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        journalistName=journalistName.replaceAll("<[^>]*>", "").trim();
+
+        return new String[] { time, journalistName};
+    }
+
+
 
     // 관련 기사 목록 조회하기
     public List<RelatedArticleDto> getRelatedArticles(String articleUrl) {

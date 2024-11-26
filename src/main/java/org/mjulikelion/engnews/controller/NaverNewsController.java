@@ -1,9 +1,7 @@
 package org.mjulikelion.engnews.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
@@ -23,20 +21,20 @@ public class NaverNewsController {
     private final NaverNewsService naverNewsService;
 
     @GetMapping("/keyword")
-    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNaverNewsByKeyword(@AuthenticatedUser User user) {
-        List<CategoryArticleDto> articles = naverNewsService.getNewsByKeyword(user);
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNaverNewsByKeyword(@AuthenticatedUser User user, @RequestParam String sort) {
+        List<CategoryArticleDto> articles = naverNewsService.getNewsByKeyword(user, sort);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, " 키워드로 기사 목록 조회 성공", articles));
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNewsByCategory(@RequestParam String category, @RequestParam int page) {
-        List<CategoryArticleDto> articles = naverNewsService.getArticlesByCategory(category, page);
+    public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNewsByCategory(@RequestParam String category, @RequestParam int page, @RequestParam String sort) {
+        List<CategoryArticleDto> articles = naverNewsService.getArticlesByCategory(category, page, sort);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 기사 목록 조회 성공", articles));
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDto<ArticleDto>> getNews(@RequestParam String url) {
-        ArticleDto article=naverNewsService.getArticle(url);
+    public ResponseEntity<ResponseDto<ArticleDto>> getNews(@AuthenticatedUser User user, @RequestParam String url) {
+        ArticleDto article=naverNewsService.getArticle(user,url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 단건 조회 성공", article));
     }
 
