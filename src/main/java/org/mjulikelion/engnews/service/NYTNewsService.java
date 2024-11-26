@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.mjulikelion.engnews.dto.request.article.ArticleRequestDto;
 import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.Category;
@@ -22,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -37,8 +39,12 @@ public class NYTNewsService {
     private final CategoryRepository categoryRepository;
     private final ArticleLikeService articleLikeService;
 
-    // 키워드로 NYT 뉴스 조회
-    public List<CategoryArticleDto> getNYTNewsByKeyword(User user) {
+    // 키워드 별 NYT 뉴스 목록 조회
+    public List<CategoryArticleDto> getNYTNewsByKeyword(User user, String sort) {
+        if (sort == null || sort.isEmpty()) {
+            sort = "newest";
+        }
+
         List<Category> categories = categoryRepository.findAllByUser(user);
         List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories);
 
@@ -47,13 +53,14 @@ public class NYTNewsService {
         for (Keyword keyword : keywords) {
             String keywordName = keyword.getKeywordOptions().getKeywordName();
 
-            String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-                    + "?q=" + keywordName
-                    + "&api-key=" + clientId;
-
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
             try {
+                String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+                        + "?q=" + URLEncoder.encode(keywordName, StandardCharsets.UTF_8)
+                        + "&api-key=" + clientId
+                        + "&sort=" + sort;
+
+                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
                 JsonNode articles = rootNode.path("response").path("docs");
@@ -65,29 +72,42 @@ public class NYTNewsService {
 
                     allArticles.add(CategoryArticleDto.from(title, link, imageUrl));
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
             }
         }
+
+        if ("relevance".equals(sort)) {
+            allArticles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
+        }
+
         return allArticles;
     }
 
-    public List<CategoryArticleDto> getNYTByCategory(String category, int page) {
-        String filter = "news_desk:(" + category + ")";
-        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-                + "?fq=" + filter
-                + "&api-key=" + clientId
-                + "&page=" + (page - 1); // NYT API는 페이지 번호가 0부터 시작
+    // 카테고리 별 NYT 뉴스 목록 조회
+    public List<CategoryArticleDto> getNYTByCategory(String category, int page, String sort) {
+        if (sort == null || sort.isEmpty()) {
+            sort = "newest";
+        }
 
-        List<CategoryArticleDto> articles = new ArrayList<>();
+        String filter = category != null && !category.isEmpty()
+                ? "news_desk:(" + category + ")"
+                : "";
 
         try {
+            String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+                    + (filter.isEmpty() ? "" : "?fq=" + URLEncoder.encode(filter, StandardCharsets.UTF_8))
+                    + "&api-key=" + clientId
+                    + "&page=" + (page - 1)
+                    + "&sort=" + sort;
+
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(response.getBody());
             JsonNode articlesNode = rootNode.path("response").path("docs");
 
+            List<CategoryArticleDto> articles = new ArrayList<>();
             for (JsonNode article : articlesNode) {
                 String title = article.path("headline").path("main").asText();
                 String link = article.path("web_url").asText();
@@ -95,11 +115,16 @@ public class NYTNewsService {
 
                 articles.add(CategoryArticleDto.from(title, link, imageUrl));
             }
+
+            if ("relevance".equals(sort)) {
+                articles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
+            }
+            return articles;
         } catch (IOException e) {
             throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
         }
-        return articles;
     }
+
 
 
     // 단건 기사 조회
