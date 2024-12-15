@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "article_like")
 public class ArticleLike extends BaseEntity {
 
-    @Column(nullable = false)
-    private String original_url;
+    @Column(name = "original_url", nullable = false)
+    private String originalUrl;
 
     @Column(nullable = false)
     private String news;
