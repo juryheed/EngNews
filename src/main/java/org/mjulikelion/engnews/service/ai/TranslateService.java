@@ -1,7 +1,13 @@
-package org.mjulikelion.engnews.service;
+package org.mjulikelion.engnews.service.ai;
 
 import lombok.RequiredArgsConstructor;
-import org.mjulikelion.engnews.dto.ai.*;
+import org.mjulikelion.engnews.dto.ai.request.E2kTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.K2eTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.TranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.TryTranslateDto;
+import org.mjulikelion.engnews.dto.ai.response.E2kResponseDto;
+import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
+import org.mjulikelion.engnews.dto.ai.response.K2eResponseDto;
 import org.mjulikelion.engnews.entity.User;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
