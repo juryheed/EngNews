@@ -18,8 +18,8 @@ public class TranslateController {
     private final TranslateService translateService;
 
     @PostMapping("/try-translate")
-    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslate(@AuthenticatedUser User user, @RequestBody TryDto tryDto) {
-        FeedbackDto feedback=translateService.tryTranslate(user,tryDto);
+    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslate(@AuthenticatedUser User user, @RequestBody TryTranslateDto tryTranslateDto) {
+        FeedbackDto feedback=translateService.tryTranslate(user,tryTranslateDto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 번역하고 피드백 받기 성공", feedback));
     }
 
