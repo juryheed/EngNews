@@ -16,7 +16,7 @@ public class TranslateService {
     private final String e2kTranslateURL = "http://43.203.141.103:8000/translate_t5_e2k";
     private final String k2eTranslateURL = "http://43.203.141.103:8000/translate_t5_k2e";
 
-    public FeedbackDto tryTranslate(User user, TryDto tryDto) {
+    public FeedbackDto tryTranslate(User user, TryTranslateDto tryTranslateDto) {
 
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -24,7 +24,7 @@ public class TranslateService {
         headers.add("user", String.valueOf(user.getId()));
 
         // HTTP 요청 엔터티 생성 (헤더 + 바디)
-        HttpEntity<TryDto> entity = new HttpEntity<>(tryDto, headers);
+        HttpEntity<TryTranslateDto> entity = new HttpEntity<>(tryTranslateDto, headers);
 
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(try_TranslateURL, HttpMethod.POST, entity, String.class);
