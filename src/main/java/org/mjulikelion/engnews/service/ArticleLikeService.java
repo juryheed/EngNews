@@ -26,7 +26,7 @@ public class ArticleLikeService {
 
         List<ArticleLikeResponseDto> articleLikeDtos = articleLikes.stream()
                 .map(articleLike -> {
-                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginal_url());
+                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginalUrl());
                     return ArticleLikeResponseDto.from(
                             articleLike,
                             titleAndImageAndContent[0],
@@ -46,7 +46,7 @@ public class ArticleLikeService {
 
         List<ArticleLikeResponseDto> articleLikeDtos = articleLikes.stream()
                 .map(articleLike -> {
-                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginal_url());
+                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginalUrl());
                     return ArticleLikeResponseDto.from(
                             articleLike,
                             titleAndImageAndContent[0],
@@ -87,14 +87,14 @@ public class ArticleLikeService {
     public void saveArticleLike(User user, String originalUrl, String news) {
         ArticleLike articleLike = ArticleLike.builder()
                 .user(user)
-                .original_url(originalUrl)
+                .originalUrl(originalUrl)
                 .news(news)
                 .build();
         articleLikeRepository.save(articleLike);
     }
 
-    public void deleteArticleLikeById(User user, UUID articleLikeId) {
-        ArticleLike articleLike = articleLikeRepository.findByUserAndId(user, articleLikeId)
+    public void deleteArticleLikeById(User user, String url) {
+        ArticleLike articleLike = articleLikeRepository.findByOriginalUrlAndUser( url,user)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ARTICLE_LIKE_NOT_FOUND));
         articleLikeRepository.delete(articleLike);
     }

@@ -151,7 +151,7 @@ public class NaverNewsService {
 
         // for 루프를 사용하여 각 ArticleLike의 original_url을 추출
         for (ArticleLike articleLike : articleLikes) {
-            urls.add(articleLike.getOriginal_url());
+            urls.add(articleLike.getOriginalUrl());
         }
 
         boolean isArticleLike = urls.contains(url);

@@ -18,7 +18,7 @@ public class ArticleLikeResponseDto {
     public static ArticleLikeResponseDto from(ArticleLike articleLike, String title, String imageUrl, String content) {
         return ArticleLikeResponseDto.builder()
                 .id(articleLike.getId())
-                .originalUrl(articleLike.getOriginal_url())
+                .originalUrl(articleLike.getOriginalUrl())
                 .title(title)
                 .imageUrl(imageUrl)
                 .content(content)
@@ -28,7 +28,7 @@ public class ArticleLikeResponseDto {
     public static ArticleLikeResponseDto from(ArticleLike articleLike, String title, String content) {
         return ArticleLikeResponseDto.builder()
                 .id(articleLike.getId())
-                .originalUrl(articleLike.getOriginal_url())
+                .originalUrl(articleLike.getOriginalUrl())
                 .title(title)
                 .imageUrl(null)
                 .content(content)

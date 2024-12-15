@@ -12,7 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @AllArgsConstructor
@@ -40,9 +41,10 @@ public class ArticleLikeController {
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "기사 찜하기 완료"), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{articleId}")
-    public ResponseEntity<ResponseDto<Void>> deleteArticleLikeById(@AuthenticatedUser User user, @PathVariable UUID articleId) {
-        articleLikeService.deleteArticleLikeById(user, articleId);
+    @DeleteMapping
+    public ResponseEntity<ResponseDto<Void>> deleteArticleLikeById(@AuthenticatedUser User user,@RequestParam String url) {
+        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
+        articleLikeService.deleteArticleLikeById(user, decodedUrl);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "찜한 뉴스 삭제 완료"), HttpStatus.OK);
     }
 }
