@@ -3,17 +3,20 @@ package org.mjulikelion.engnews.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mjulikelion.engnews.dto.request.category.CategoryListDto;
+import org.mjulikelion.engnews.dto.response.category.CategoryInfoDto;
 import org.mjulikelion.engnews.dto.response.category.CategoryListResponseDto;
 import org.mjulikelion.engnews.dto.response.category.CategoryResponseDto;
 import org.mjulikelion.engnews.dto.response.category.UserCategoryListResponseDto;
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.CategoryOptions;
+import org.mjulikelion.engnews.entity.KeywordOptions;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.entity.type.CategoryType;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.NotFoundException;
 import org.mjulikelion.engnews.repository.CategoryOptionsRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
+import org.mjulikelion.engnews.repository.KeywordOptionsRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -29,6 +32,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final CategoryOptionsRepository categoryOptionsRepository;
+    private final KeywordOptionsRepository keywordOptionsRepository;
 
     public CategoryListResponseDto getNaverCategories() {
         return getCategoriesByNews("naver");
@@ -71,6 +75,16 @@ public class CategoryService {
                 .build();
 
         categoryRepository.save(newCategory);
+    }
+
+    public List<CategoryInfoDto> getCategoryInfo(User user) {
+        List<Category> categories = categoryRepository.findAllByUser(user);
+        return categories.stream()
+                .map(category -> {
+                    List<KeywordOptions> keywordOptions = keywordOptionsRepository.findAllByCategoryOptions(category.getCategoryOptions());
+                    return CategoryInfoDto.from(category, keywordOptions);
+                })
+                .collect(Collectors.toList());
     }
 
     private CategoryType isValidCategory(String category) {
