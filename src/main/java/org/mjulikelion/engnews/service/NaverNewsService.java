@@ -196,12 +196,18 @@ public class NaverNewsService {
             Document doc = Jsoup.connect(articleUrl).get();
             Elements relatedNewsElements = doc.select("ul.ofhe_list li");
             for (Element element : relatedNewsElements) {
-                String relatedTitle = element.text();
-                String relatedLink = element.attr("href");
+                String relatedTitle = element.select("a").text();
+
+                String relatedLink = element.select("a").attr("href");
                 if (!relatedLink.startsWith("http")) {
                     relatedLink = "https://news.naver.com" + relatedLink;
                 }
+
                 String imageUrl = crawlImageUrlFromArticle(relatedLink);
+                if (imageUrl.isEmpty()) {
+                    imageUrl = "https://via.placeholder.com/150"; // 기본 이미지 설정
+                }
+
                 relatedArticles.add(RelatedArticleDto.from(relatedTitle, relatedLink, imageUrl));
             }
         } catch (IOException e) {
@@ -210,6 +216,7 @@ public class NaverNewsService {
         }
         return relatedArticles;
     }
+
 
 
     // 네이버 뉴스 top5 조회하기
