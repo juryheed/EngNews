@@ -12,4 +12,5 @@ public interface ArticleLikeRepository extends JpaRepository<ArticleLike, UUID> 
     Optional<ArticleLike> findByUserAndId(User user, UUID articleLikeId);
     List<ArticleLike> findAllByUserAndNews(User user, String news);
     List<ArticleLike> findAllByUser(User user);
+    Optional<ArticleLike> findByOriginalUrlAndUser(String originalUrl, User user);
 }
