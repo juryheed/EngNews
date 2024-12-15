@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.controller;
+package org.mjulikelion.engnews.controller.ai;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;

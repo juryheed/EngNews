@@ -19,7 +19,7 @@ public class TranslateService {
     private final String translateURL = "http://43.203.141.103:8000/translate";
     private final String e2kTranslateURL = "http://43.203.141.103:8000/translate_t5_e2k";
 
-    public FeedbackDto tryTranslate(User user, TryDto tryDto){
+    public FeedbackDto tryTranslate(User user, TryDto tryDto) {
 
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -40,7 +40,7 @@ public class TranslateService {
         return feedback;
     }
 
-    public FeedbackDto translate(User user, TranslateDto translateDto){
+    public FeedbackDto translate(User user, TranslateDto translateDto) {
 
         System.out.print(user);
         // HTTP 헤더 설정
