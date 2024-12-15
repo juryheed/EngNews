@@ -22,7 +22,7 @@ public class AuthenticationConfig implements WebMvcConfigurer {
                 .addPathPatterns(
                         "/users/**","/words-like/**","/categories/**","/keywords/**","/articles-like/**",
                         "/news/**","/news/nyt/keyword","/news/naver/keyword",
-                        "/try-summarize/**","/try-translate/**","/translate","/news/naver","/news/nyt","/translate_t5_e2k")
+                        "/try-summarize/**","/try-translate/**","/translate","/news/naver","/news/nyt","/translate_t5_e2k", "/translate_t5_k2e")
 
                 .excludePathPatterns(
                         "/categories/naver", "/categories/nyt",
