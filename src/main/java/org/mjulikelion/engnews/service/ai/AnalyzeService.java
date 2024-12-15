@@ -1,9 +1,9 @@
-package org.mjulikelion.engnews.service;
+package org.mjulikelion.engnews.service.ai;
 
 
 import lombok.RequiredArgsConstructor;
-import org.mjulikelion.engnews.dto.ai.AnalyzeSentenceDto;
-import org.mjulikelion.engnews.dto.ai.FeedbackDto;
+import org.mjulikelion.engnews.dto.ai.request.AnalyzeSentenceDto;
+import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
 import org.mjulikelion.engnews.entity.User;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

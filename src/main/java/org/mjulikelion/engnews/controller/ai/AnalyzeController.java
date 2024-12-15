@@ -1,12 +1,12 @@
-package org.mjulikelion.engnews.controller;
+package org.mjulikelion.engnews.controller.ai;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.ai.AnalyzeSentenceDto;
-import org.mjulikelion.engnews.dto.ai.FeedbackDto;
+import org.mjulikelion.engnews.dto.ai.request.AnalyzeSentenceDto;
+import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.entity.User;
-import org.mjulikelion.engnews.service.AnalyzeService;
+import org.mjulikelion.engnews.service.ai.AnalyzeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

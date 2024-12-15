@@ -1,11 +1,17 @@
-package org.mjulikelion.engnews.controller;
+package org.mjulikelion.engnews.controller.ai;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.ai.*;
+import org.mjulikelion.engnews.dto.ai.request.E2kTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.K2eTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.TranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.TryTranslateDto;
+import org.mjulikelion.engnews.dto.ai.response.E2kResponseDto;
+import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
+import org.mjulikelion.engnews.dto.ai.response.K2eResponseDto;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
 import org.mjulikelion.engnews.entity.User;
-import org.mjulikelion.engnews.service.TranslateService;
+import org.mjulikelion.engnews.service.ai.TranslateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +24,8 @@ public class TranslateController {
     private final TranslateService translateService;
 
     @PostMapping("/try-translate")
-    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslate(@AuthenticatedUser User user, @RequestBody TryDto tryDto) {
-        FeedbackDto feedback=translateService.tryTranslate(user,tryDto);
+    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslate(@AuthenticatedUser User user, @RequestBody TryTranslateDto tryTranslateDto) {
+        FeedbackDto feedback=translateService.tryTranslate(user,tryTranslateDto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 번역하고 피드백 받기 성공", feedback));
     }
 
