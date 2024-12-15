@@ -2,6 +2,8 @@ package org.mjulikelion.engnews.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
+import org.mjulikelion.engnews.dto.ai.E2kResponseDto;
+import org.mjulikelion.engnews.dto.ai.E2kTranslateDto;
 import org.mjulikelion.engnews.dto.ai.FeedbackDto;
 import org.mjulikelion.engnews.dto.ai.TranslateDto;
 import org.mjulikelion.engnews.dto.ai.TryDto;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping
 public class TranslateController {
     private final TranslateService translateService;
 
@@ -29,5 +32,11 @@ public class TranslateController {
     public ResponseEntity<ResponseDto<FeedbackDto>> translate(@AuthenticatedUser User user, @RequestBody TranslateDto translateDto){
         FeedbackDto feedback=translateService.translate(user,translateDto);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사를 한글↔영어 통번역 성공",feedback));
+
+    @PostMapping("/translate_t5_e2k")
+    public ResponseEntity<ResponseDto<E2kResponseDto>> e2kTranslate(@AuthenticatedUser User user, @RequestBody E2kTranslateDto e2kTranslateDto) {
+        E2kResponseDto e2kResponseDto = translateService.e2kTranslate(user,e2kTranslateDto);
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "영어에서 한국어로 통번역하기 성공", e2kResponseDto));
+
     }
 }
