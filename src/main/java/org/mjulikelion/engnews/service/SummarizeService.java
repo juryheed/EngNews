@@ -2,7 +2,7 @@ package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.dto.ai.FeedbackDto;
-import org.mjulikelion.engnews.dto.ai.TryDto;
+import org.mjulikelion.engnews.dto.ai.TrySummarizeDto;
 import org.mjulikelion.engnews.entity.User;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ public class SummarizeService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final String trySummarizeURL = "http://43.203.141.103:8000/try-summarize";
 
-    public FeedbackDto trySummarize(User user, TryDto tryDto){
+    public FeedbackDto trySummarize(User user, TrySummarizeDto trySummarizeDto){
 
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -22,7 +22,7 @@ public class SummarizeService {
         headers.add("user", String.valueOf(user.getId()));
 
         // HTTP 요청 엔터티 생성 (헤더 + 바디)
-        HttpEntity<TryDto> entity = new HttpEntity<>(tryDto, headers);
+        HttpEntity<TrySummarizeDto> entity = new HttpEntity<>(trySummarizeDto, headers);
 
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(trySummarizeURL, HttpMethod.POST, entity, String.class);
