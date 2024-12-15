@@ -1,4 +1,4 @@
-package org.mjulikelion.engnews.dto.ai;
+package org.mjulikelion.engnews.dto.ai.response;
 
 import lombok.Builder;
 import lombok.Getter;
