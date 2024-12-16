@@ -23,13 +23,13 @@ public class NYTNewsController {
     @GetMapping("/keyword")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTNewsByKeyword(@AuthenticatedUser User user, @RequestParam String sort) {
         List<CategoryArticleDto> articles = nytService.getNYTNewsByKeyword(user, sort);
-        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, " 키워드로 NYT 기사 목록 조회 성공", articles));
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "유저 키워드 별 NYT 기사 목록 조회 성공", articles));
     }
 
     @GetMapping("/categories")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getNYTByCategory(@RequestParam String category, @RequestParam int page, @RequestParam String sort) {
         List<CategoryArticleDto> articles = nytService.getNYTByCategory(category, page, sort);
-        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 NYT 기사 목록 조회 성공", articles));
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, category+" 카테고리 별 NYT 기사 목록 조회 성공", articles));
     }
 
     @GetMapping
@@ -41,6 +41,6 @@ public class NYTNewsController {
     @GetMapping("/top5")
     public ResponseEntity<ResponseDto<List<CategoryArticleDto>>> getTop5NYTNews() {
         List<CategoryArticleDto> articles = nytService.getTop5NYTNews();
-        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 뉴스 top5 목록 조회 성공", articles));
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 기사 TOP5 목록 조회 성공", articles));
     }
 }

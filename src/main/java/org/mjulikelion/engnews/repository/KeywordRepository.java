@@ -2,6 +2,7 @@ package org.mjulikelion.engnews.repository;
 
 import org.mjulikelion.engnews.entity.Category;
 import org.mjulikelion.engnews.entity.Keyword;
+import org.mjulikelion.engnews.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public interface KeywordRepository extends JpaRepository<Keyword, UUID> {
     List<Keyword> findAllByCategory(Category category);
-    Optional<Keyword> findById(UUID id);
+    Optional<Keyword> findById(UUID keywordId);
+    Optional<Keyword> findByUserAndId(User user, UUID keywordId);
     List<Keyword> findAllByCategoryIn(List<Category> categories);
 }

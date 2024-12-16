@@ -1,6 +1,5 @@
 package org.mjulikelion.engnews.controller;
 
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/keywords")
-public class keywordController {
+public class KeywordController {
 
     private final KeywordService keywordService;
 
