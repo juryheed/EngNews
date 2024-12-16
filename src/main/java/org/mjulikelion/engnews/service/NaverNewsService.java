@@ -11,11 +11,8 @@ import org.mjulikelion.engnews.dto.response.article.ArticleDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.dto.response.article.RelatedArticleDto;
 import org.mjulikelion.engnews.entity.*;
-import org.mjulikelion.engnews.exception.ErrorCode;
-import org.mjulikelion.engnews.exception.UnauthorizedException;
 import org.mjulikelion.engnews.repository.ArticleLikeRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
-import org.mjulikelion.engnews.repository.KeywordOptionsRepository;
 import org.mjulikelion.engnews.repository.KeywordRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -28,8 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,58 +42,23 @@ public class NaverNewsService {
 
     private final KeywordRepository keywordRepository;
     private final CategoryRepository categoryRepository;
-    private final KeywordOptionsRepository keywordOptionsRepository;
     private final ArticleLikeService articleLikeService;
     private final ArticleLikeRepository articleLikeRepository;
 
     //키워드로 네이버 뉴스 크롤링하기
     public List<CategoryArticleDto> getNewsByKeyword(User user, String sort) {
-        List<Category> categories = categoryRepository.findAllByUser(user); // 유저 카테고리 조회
-        List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories); // 카테고리별 키워드 조회
-
+        List<Category> categories = categoryRepository.findAllByUser(user);
+        List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories);
         List<CategoryArticleDto> allArticles = new ArrayList<>();
+
+        HttpHeaders headers = createNaverApiHeaders();
 
         for (Keyword keyword : keywords) {
             String keywordName = keyword.getKeywordOptions().getKeywordName();
-
-            // URI 생성
-            StringBuffer sb = new StringBuffer();
-            sb.append("https://openapi.naver.com/v1/search/news.json?query=");
-            sb.append(keywordName);
-            sb.append("&display=10&start=1&sort=").append(sort);
-            String url = sb.toString();
-
-            // 헤더 설정
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-Naver-Client-Id", clientId);
-            headers.set("X-Naver-Client-Secret", clientSecret);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
-            // API 호출
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-            // Jackson을 사용하여 JSON 파싱
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                JsonNode items = rootNode.path("items");
-
-                // 기사 제목과 링크와 이미지를 리스트에 추가
-                for (JsonNode item : items) {
-                    String title = item.path("title").asText();
-                    String link = item.path("link").asText();
-                    String imageUrl = crawlImageUrlFromArticle(link);
-
-                    CategoryArticleDto article = CategoryArticleDto.from(title, link, imageUrl);
-
-                    // 리스트에 추가
-                    allArticles.add(article);
-                }
-            } catch (Exception e) {
-                System.err.println("JSON 파싱 오류: " + e.getMessage());
-            }
+            String url = "https://openapi.naver.com/v1/search/news.json?query=" + keywordName
+                    + "&display=10&start=1&sort=" + sort;
+            allArticles.addAll(fetchArticlesFromApi(url, headers));
         }
-        // ArticleListDto로 반환
         return allArticles;
     }
 
@@ -108,38 +68,11 @@ public class NaverNewsService {
         int start = (page - 1) * display + 1;
 
         String url = "https://openapi.naver.com/v1/search/news.json?query=" + category
-                + "&display=" + display
-                + "&start=" + start
-                + "&sort=" + sort;
+                + "&display=" + display + "&start=" + start + "&sort=" + sort;
 
-        List<CategoryArticleDto> articles = new ArrayList<>();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Naver-Client-Id", clientId);
-        headers.set("X-Naver-Client-Secret", clientSecret);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(response.getBody());
-            JsonNode items = rootNode.path("items");
-
-            for (JsonNode item : items) {
-                String title = item.path("title").asText();
-                String link = item.path("link").asText();
-                String imageUrl = crawlImageUrlFromArticle(link);
-
-                articles.add(CategoryArticleDto.from(title, link, imageUrl));
-            }
-        } catch (IOException e) {
-            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
-        }
-
-        return articles;
+        HttpHeaders headers = createNaverApiHeaders();
+        return fetchArticlesFromApi(url, headers);
     }
-
 
     //네이버 뉴스 단건 조회
     public ArticleDto getArticle(User user, String url) {
@@ -168,6 +101,67 @@ public class NaverNewsService {
         );
     }
 
+    // 관련 기사 목록 조회하기
+    public List<RelatedArticleDto> getRelatedArticles(String articleUrl) {
+        List<RelatedArticleDto> relatedArticles = new ArrayList<>();
+        try {
+            Document doc = Jsoup.connect(articleUrl).get();
+            Elements relatedNewsElements = doc.select("ul.ofhe_list li");
+            for (Element element : relatedNewsElements) {
+                String relatedTitle = element.select("a").text();
+
+                String relatedLink = element.select("a").attr("href");
+                if (!relatedLink.startsWith("http")) {
+                    relatedLink = "https://news.naver.com" + relatedLink;
+                }
+
+                String imageUrl = crawlImageUrlFromArticle(relatedLink);
+                if (imageUrl.isEmpty()) {
+                    imageUrl = "https://via.placeholder.com/150";
+                }
+
+                relatedArticles.add(RelatedArticleDto.from(relatedTitle, relatedLink, imageUrl));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("관련 뉴스 크롤링 실패: " + e.getMessage());
+        }
+        return relatedArticles;
+    }
+
+    // 네이버 뉴스 top5 조회하기
+    public List<CategoryArticleDto> getTop5NaverNews() {
+        String url = "https://news.naver.com/main/ranking/popularDay.naver";
+        List<CategoryArticleDto> topRankingArticles = new ArrayList<>();
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Element firstRankingBox = doc.select(".rankingnews_box").first();
+
+            if (firstRankingBox != null) {
+                Elements rankingArticles = firstRankingBox.select(".rankingnews_list li");
+
+                for (int i = 0; i < Math.min(5, rankingArticles.size()); i++) {
+                    Element articleElement = rankingArticles.get(i);
+                    String title = articleElement.select(".list_title").text();
+                    String link = articleElement.select("a").attr("href");
+
+                    if (!link.startsWith("http")) {
+                        link = "https://news.naver.com" + link;
+                    }
+
+                    String imageUrl = crawlImageUrlFromArticle(link);
+                    topRankingArticles.add(CategoryArticleDto.from(title, link, imageUrl));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("네이버 뉴스 랭킹 크롤링 실패");
+        }
+        return topRankingArticles;
+    }
+
+    // 기사 날짜랑 기자 추출 메서드
     protected String[] getTimeAndJournalistNameFromUrl(String url) {
         String time = "";
         String journalistName = "";
@@ -187,93 +181,55 @@ public class NaverNewsService {
         return new String[] { time, journalistName};
     }
 
-
-
-    // 관련 기사 목록 조회하기
-    public List<RelatedArticleDto> getRelatedArticles(String articleUrl) {
-        List<RelatedArticleDto> relatedArticles = new ArrayList<>();
+    // API 호출 및 JSON 파싱 메서드
+    private List<CategoryArticleDto> fetchArticlesFromApi(String url, HttpHeaders headers) {
+        List<CategoryArticleDto> articles = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(articleUrl).get();
-            Elements relatedNewsElements = doc.select("ul.ofhe_list li");
-            for (Element element : relatedNewsElements) {
-                String relatedTitle = element.select("a").text();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-                String relatedLink = element.select("a").attr("href");
-                if (!relatedLink.startsWith("http")) {
-                    relatedLink = "https://news.naver.com" + relatedLink;
-                }
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode items = rootNode.path("items");
 
-                String imageUrl = crawlImageUrlFromArticle(relatedLink);
-                if (imageUrl.isEmpty()) {
-                    imageUrl = "https://via.placeholder.com/150"; // 기본 이미지 설정
-                }
+            for (JsonNode item : items) {
+                String title = item.path("title").asText();
+                String link = item.path("link").asText();
+                String imageUrl = crawlImageUrlFromArticle(link);
 
-                relatedArticles.add(RelatedArticleDto.from(relatedTitle, relatedLink, imageUrl));
+                articles.add(CategoryArticleDto.from(title, link, imageUrl));
             }
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("관련 뉴스 크롤링 실패: " + e.getMessage());
+            throw new RuntimeException("API 호출 및 파싱 실패");
         }
-        return relatedArticles;
+        return articles;
     }
 
-
-
-    // 네이버 뉴스 top5 조회하기
-    public List<CategoryArticleDto> getTop5NaverNews() {
-        String url = "https://news.naver.com/main/ranking/popularDay.naver";
-        List<CategoryArticleDto> topRankingArticles = new ArrayList<>();
-
-        try {
-            Document doc = Jsoup.connect(url).get();
-
-            Element firstRankingBox = doc.select(".rankingnews_box").first();   // 첫 번째 언론사의 top5 크롤링
-
-            if (firstRankingBox != null) {
-                Elements rankingArticles = firstRankingBox.select(".rankingnews_list li");
-
-                for (int i = 0; i < Math.min(5, rankingArticles.size()); i++) {
-                    Element articleElement = rankingArticles.get(i);
-                    String title = articleElement.select(".list_title").text();
-                    String link = articleElement.select("a").attr("href");
-
-                    if (!link.startsWith("http")) {
-                        link = "https://news.naver.com" + link;
-                    }
-
-                    String imageUrl = crawlImageUrlFromArticle(link);
-                    topRankingArticles.add(CategoryArticleDto.from(title, link, imageUrl));
-                }
-            } else {
-                System.err.println("첫 번째 rankingnews_box를 찾을 수 없습니다.");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("네이버 뉴스 랭킹 크롤링 실패");
-        }
-        return topRankingArticles;
+    // 헤더 설정 메서드
+    private HttpHeaders createNaverApiHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Naver-Client-Id", clientId);
+        headers.set("X-Naver-Client-Secret", clientSecret);
+        return headers;
     }
 
-
+    // 이미지 url 크롤링 메서드
     public String crawlImageUrlFromArticle(String articleLink) {
         try {
-            // 기사 페이지로 HTTP 요청 보내기
             Document doc = Jsoup.connect(articleLink).get();
 
-            // 이미지 URL을 추출할 수 있는 부분을 찾기
             Elements metaTags = doc.select("meta[property=og:image]");
 
-            // 첫 번째 <meta> 태그에서 'content' 속성값을 가져옴 (대표 이미지 URL)
             if (!metaTags.isEmpty()) {
                 String imageUrl = metaTags.first().attr("content");
                 return imageUrl;
             } else {
-                // 대표 이미지가 없으면, 기본 이미지 URL을 반환
-                return "https://via.placeholder.com/150"; // 기본 이미지
+                return "https://via.placeholder.com/150";
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return "https://via.placeholder.com/150"; // 오류 발생 시 기본 이미지
+            return "https://via.placeholder.com/150";
         }
     }
 }
