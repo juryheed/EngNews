@@ -3,7 +3,7 @@ package org.mjulikelion.engnews.controller;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
 import org.mjulikelion.engnews.dto.response.ResponseDto;
-import org.mjulikelion.engnews.dto.response.article.ArticleDto;
+import org.mjulikelion.engnews.dto.response.article.ArticleNytDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.service.NYTNewsService;
@@ -33,8 +33,8 @@ public class NYTNewsController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDto<ArticleDto>> getNYTNews(@AuthenticatedUser User user,@RequestParam String url) {
-        ArticleDto article=nytService.getNYTNews(user, url);
+    public ResponseEntity<ResponseDto<ArticleNytDto>> getNYTNews(@AuthenticatedUser User user, @RequestParam String url) {
+        ArticleNytDto article = nytService.getNYTNews(user, url);
         return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "NYT 기사 단건 조회 성공", article));
     }
 
