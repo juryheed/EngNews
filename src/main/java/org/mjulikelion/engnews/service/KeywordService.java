@@ -1,5 +1,6 @@
 package org.mjulikelion.engnews.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.dto.request.keyword.KeywordDto;
 import org.mjulikelion.engnews.dto.response.keyword.CategoryKeywordListResponseDto;
@@ -60,7 +61,7 @@ public class KeywordService {
 
     // 키워드 삭제
     public void deleteKeyword(User user, UUID keywordId) {
-        Keyword keyword = keywordRepository.findByUserAndId(user, keywordId)
+        Keyword keyword = keywordRepository.findById(keywordId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.KEYWORD_NOT_FOUMD));
         keywordRepository.delete(keyword);
     }
