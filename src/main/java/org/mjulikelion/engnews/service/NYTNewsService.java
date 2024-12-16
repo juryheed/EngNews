@@ -69,7 +69,7 @@ public class NYTNewsService {
         return allArticles;
     }
 
-    // 카테고리 별 NYT 뉴스 목록 조회
+   // 카테고리 별 NYT 뉴스 목록 조회
     public List<CategoryArticleDto> getNYTByCategory(String category, int page, String sort) {
         if (sort == null || sort.isEmpty()) {
             sort = "newest";
@@ -92,8 +92,6 @@ public class NYTNewsService {
 
         return articles;
     }
-
-
 
     // 단건 기사 조회
     public ArticleDto getNYTNews(User user,String url) {
