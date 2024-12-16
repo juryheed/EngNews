@@ -96,12 +96,11 @@ public class NYTNewsService {
         }
 
         String filter = category != null && !category.isEmpty()
-                ? "news_desk:(" + category + ")"
+                ? "section_name:(" + category + ")"
                 : "";
-
         try {
             String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-                    + (filter.isEmpty() ? "" : "?fq=" + URLEncoder.encode(filter, StandardCharsets.UTF_8))
+                    + (filter.isEmpty() ? "" : "?fq=" + filter)
                     + "&api-key=" + clientId
                     + "&page=" + (page - 1)
                     + "&sort=" + sort;
