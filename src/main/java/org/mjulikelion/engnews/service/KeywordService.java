@@ -1,7 +1,6 @@
 package org.mjulikelion.engnews.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.mjulikelion.engnews.dto.request.keyword.KeywordDto;
 import org.mjulikelion.engnews.dto.response.keyword.CategoryKeywordListResponseDto;
 import org.mjulikelion.engnews.dto.response.keyword.KeywordOptionListResponseDto;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KeywordService {
@@ -44,7 +41,6 @@ public class KeywordService {
         Category category = categoryRepository.findById(keywordDto.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        //키워드 저장
         Keyword keyword = Keyword.builder()
                 .keywordOptions(keywordOptions)
                 .category(category)
@@ -57,7 +53,6 @@ public class KeywordService {
     public CategoryKeywordListResponseDto getKeyword(User user, UUID categoryId){
         Category category = categoryRepository.findByUserAndId(user,categoryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
-
         List<Keyword> keywords = keywordRepository.findAllByCategory(category);
 
         return CategoryKeywordListResponseDto.from(keywords);
@@ -65,7 +60,7 @@ public class KeywordService {
 
     // 키워드 삭제
     public void deleteKeyword(User user, UUID keywordId) {
-        Keyword keyword = keywordRepository.findById(keywordId)
+        Keyword keyword = keywordRepository.findByUserAndId(user, keywordId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.KEYWORD_NOT_FOUMD));
         keywordRepository.delete(keyword);
     }

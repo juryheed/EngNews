@@ -7,7 +7,6 @@ import org.mjulikelion.engnews.entity.User;
 import org.mjulikelion.engnews.entity.WordLike;
 import org.mjulikelion.engnews.exception.ErrorCode;
 import org.mjulikelion.engnews.exception.NotFoundException;
-import org.mjulikelion.engnews.repository.UserRepository;
 import org.mjulikelion.engnews.repository.WordLikeRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class WordLikeService {
-    private final UserRepository userRepository;
     private final WordLikeRepository wordLikeRepository;
 
     // 단어 찜하기

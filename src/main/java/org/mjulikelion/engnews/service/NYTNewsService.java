@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,45 +45,26 @@ public class NYTNewsService {
 
     // 키워드 별 NYT 뉴스 목록 조회
     public List<CategoryArticleDto> getNYTNewsByKeyword(User user, String sort) {
+        List<Category> categories = categoryRepository.findAllByUser(user);
+        List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories);
+        List<CategoryArticleDto> allArticles = new ArrayList<>();
+
         if (sort == null || sort.isEmpty()) {
             sort = "newest";
         }
 
-        List<Category> categories = categoryRepository.findAllByUser(user);
-        List<Keyword> keywords = keywordRepository.findAllByCategoryIn(categories);
-
-        List<CategoryArticleDto> allArticles = new ArrayList<>();
-
         for (Keyword keyword : keywords) {
             String keywordName = keyword.getKeywordOptions().getKeywordName();
+            String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+                    + "?q=" + URLEncoder.encode(keywordName, StandardCharsets.UTF_8)
+                    + "&api-key=" + clientId
+                    + "&sort=" + sort;
 
-            try {
-                String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-                        + "?q=" + URLEncoder.encode(keywordName, StandardCharsets.UTF_8)
-                        + "&api-key=" + clientId
-                        + "&sort=" + sort;
-
-                ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(response.getBody());
-                JsonNode articles = rootNode.path("response").path("docs");
-
-                for (JsonNode article : articles) {
-                    String title = article.path("headline").path("main").asText();
-                    String link = article.path("web_url").asText();
-                    String imageUrl = crawlImageUrlFromArticle(link);
-
-                    allArticles.add(CategoryArticleDto.from(title, link, imageUrl));
-                }
-            } catch (IOException e) {
-                throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
-            }
+            JsonNode articlesNode = fetchNYTArticles(url);
+            allArticles.addAll(parseArticles(articlesNode));
         }
 
-        if ("relevance".equals(sort)) {
-            allArticles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
-        }
+        sortArticles(allArticles, sort);
 
         return allArticles;
     }
@@ -98,6 +78,7 @@ public class NYTNewsService {
         String filter = category != null && !category.isEmpty()
                 ? "section_name:(" + category + ")"
                 : "";
+      
         try {
             String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
                     + (filter.isEmpty() ? "" : "?fq=" + filter)
@@ -107,26 +88,12 @@ public class NYTNewsService {
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(response.getBody());
-            JsonNode articlesNode = rootNode.path("response").path("docs");
+        JsonNode articlesNode = fetchNYTArticles(url);
+        List<CategoryArticleDto> articles = parseArticles(articlesNode);
 
-            List<CategoryArticleDto> articles = new ArrayList<>();
-            for (JsonNode article : articlesNode) {
-                String title = article.path("headline").path("main").asText();
-                String link = article.path("web_url").asText();
-                String imageUrl = crawlImageUrlFromArticle(link);
+        sortArticles(articles, sort);
 
-                articles.add(CategoryArticleDto.from(title, link, imageUrl));
-            }
-
-            if ("relevance".equals(sort)) {
-                articles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
-            }
-            return articles;
-        } catch (IOException e) {
-            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
-        }
+        return articles;
     }
 
 
@@ -158,7 +125,58 @@ public class NYTNewsService {
         );
     }
 
+    // NYT 뉴스 top5 조회하기
+    public List<CategoryArticleDto> getTop5NYTNews() {
+        String url = "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=" + clientId;
+        List<CategoryArticleDto> top5Articles = new ArrayList<>();
 
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            JsonNode articlesNode = rootNode.path("results");
+
+            for (int i = 0; i < Math.min(5, articlesNode.size()); i++) {
+                JsonNode article = articlesNode.get(i);
+
+                String title = article.path("title").asText();
+                String link = article.path("url").asText();
+                String imageUrl = crawlImageUrlFromArticle(link);
+
+                top5Articles.add(CategoryArticleDto.from(title, link, imageUrl));
+            }
+        } catch (IOException e) {
+            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
+        }
+        return top5Articles;
+    }
+
+
+    // NYT API 호출과 응답 처리
+    private JsonNode fetchNYTArticles(String url) {
+        try {
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readTree(response.getBody()).path("response").path("docs");
+        } catch (IOException e) {
+            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
+        }
+    }
+
+    // NYT 기사 JSON 파싱
+    private List<CategoryArticleDto> parseArticles(JsonNode articlesNode) {
+        List<CategoryArticleDto> articles = new ArrayList<>();
+        for (JsonNode article : articlesNode) {
+            String title = article.path("headline").path("main").asText();
+            String link = article.path("web_url").asText();
+            String imageUrl = crawlImageUrlFromArticle(link);
+
+            articles.add(CategoryArticleDto.from(title, link, imageUrl));
+        }
+        return articles;
+    }
+
+    // 이미지 url 크롤링 메서드
     private String crawlImageUrlFromArticle(String articleLink) {
         try {
             Document doc = Jsoup.connect(articleLink).get();
@@ -174,32 +192,10 @@ public class NYTNewsService {
         }
     }
 
-    // NYT 뉴스 top5 조회하기
-    public List<CategoryArticleDto> getTop5NYTNews() {
-        String url = "https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=" + clientId;
-        List<CategoryArticleDto> top5Articles = new ArrayList<>();
-
-        try {
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(response.getBody());
-            JsonNode articlesNode = rootNode.path("results");
-
-            for (int i = 0; i < Math.min(5, articlesNode.size()); i++) {
-                JsonNode article = articlesNode.get(i);
-
-                String title = article.path("title").asText();
-                String link = article.path("url").asText();
-                String imageUrl = crawlImageUrlFromArticle(link);
-
-                top5Articles.add(CategoryArticleDto.from(title, link, imageUrl));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new UnauthorizedException(ErrorCode.INVALID_ARTICLE);
+    // 기사 정렬 방식
+    private void sortArticles(List<CategoryArticleDto> articles, String sort) {
+        if ("relevance".equals(sort)) {
+            articles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
         }
-        return top5Articles;
     }
-
 }
