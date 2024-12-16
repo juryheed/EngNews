@@ -69,7 +69,7 @@ public class NYTNewsService {
         return allArticles;
     }
 
-    // 카테고리 별 NYT 뉴스 목록 조회
+   // 카테고리 별 NYT 뉴스 목록 조회
     public List<CategoryArticleDto> getNYTByCategory(String category, int page, String sort) {
         if (sort == null || sort.isEmpty()) {
             sort = "newest";
@@ -78,15 +78,12 @@ public class NYTNewsService {
         String filter = category != null && !category.isEmpty()
                 ? "section_name:(" + category + ")"
                 : "";
-      
-        try {
-            String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
-                    + (filter.isEmpty() ? "" : "?fq=" + filter)
-                    + "&api-key=" + clientId
-                    + "&page=" + (page - 1)
-                    + "&sort=" + sort;
 
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json"
+                + (filter.isEmpty() ? "" : "?fq=" + filter)
+                + "&api-key=" + clientId
+                + "&page=" + (page - 1)
+                + "&sort=" + sort;
 
         JsonNode articlesNode = fetchNYTArticles(url);
         List<CategoryArticleDto> articles = parseArticles(articlesNode);
@@ -95,8 +92,6 @@ public class NYTNewsService {
 
         return articles;
     }
-
-
 
     // 단건 기사 조회
     public ArticleDto getNYTNews(User user,String url) {
