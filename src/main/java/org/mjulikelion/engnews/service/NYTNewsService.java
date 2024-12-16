@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.mjulikelion.engnews.dto.response.article.ArticleDto;
+import org.mjulikelion.engnews.dto.response.article.ArticleNytDto;
 import org.mjulikelion.engnews.dto.response.article.CategoryArticleDto;
 import org.mjulikelion.engnews.entity.ArticleLike;
 import org.mjulikelion.engnews.entity.Category;
@@ -17,6 +17,7 @@ import org.mjulikelion.engnews.exception.UnauthorizedException;
 import org.mjulikelion.engnews.repository.ArticleLikeRepository;
 import org.mjulikelion.engnews.repository.CategoryRepository;
 import org.mjulikelion.engnews.repository.KeywordRepository;
+import org.mjulikelion.engnews.response.ArticleResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -94,29 +95,36 @@ public class NYTNewsService {
     }
 
     // 단건 기사 조회
-    public ArticleDto getNYTNews(User user,String url) {
-        String[] article = articleLikeService.getTitleImageAndContentFromUrl(url);
-        String[] article2 = naverNewsService.getTimeAndJournalistNameFromUrl(url);
-
+    public ArticleNytDto getNYTNews(User user, String url) {
         List<ArticleLike> articleLikes = articleLikeRepository.findAllByUser(user);
         List<String> urls = new ArrayList<>();
 
-        // for 루프를 사용하여 각 ArticleLike의 original_url을 추출
         for (ArticleLike articleLike : articleLikes) {
             urls.add(articleLike.getOriginalUrl());
         }
 
         boolean isArticleLike = urls.contains(url);
 
-        System.out.print(urls);
+        String apiUrl = "https://api.nytimes.com/svc/search/v2/articlesearch.json" +
+                "?fq=web_url:(\"" + url + "\")" +
+                "&api-key=" + clientId;
 
-        return ArticleDto.from(
-                article[0],
-                article[1],
-                article[2],
-                article2[0],
-                article2[1]
-                ,isArticleLike
+        ResponseEntity<ArticleResponse> responseEntity = restTemplate.getForEntity(apiUrl, ArticleResponse.class);
+
+        ArticleResponse response = responseEntity.getBody();
+        if (response == null || response.getResponse().getDocs().isEmpty()) {
+            throw new RuntimeException("NYT 기사를 찾을 수 없습니다.");
+        }
+
+        ArticleResponse.Response.Doc doc = response.getResponse().getDocs().get(0);
+
+        return ArticleNytDto.from(
+                doc.getHeadline().getMain(),
+                extractImageUrl(doc),
+                doc.getSnippet(),
+                doc.getPub_date(),
+                doc.getByline() != null ? doc.getByline().getOriginal() : "Unknown",
+                isArticleLike
         );
     }
 
@@ -192,5 +200,12 @@ public class NYTNewsService {
         if ("relevance".equals(sort)) {
             articles.sort(Comparator.comparingInt(a -> a.getTitle().length()));
         }
+    }
+
+    private String extractImageUrl(ArticleResponse.Response.Doc doc) {
+        if (doc.getMultimedia() != null && !doc.getMultimedia().isEmpty()) {
+            return "https://www.nytimes.com/" + doc.getMultimedia().get(0).getUrl();
+        }
+        return null;
     }
 }
