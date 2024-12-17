@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TrySummarizeDto {
+public class TrySummarizeContentDto {
     String news_content;
-    String message;
 }
