@@ -2,10 +2,7 @@ package org.mjulikelion.engnews.controller.ai;
 
 import lombok.RequiredArgsConstructor;
 import org.mjulikelion.engnews.authentication.AuthenticatedUser;
-import org.mjulikelion.engnews.dto.ai.request.E2kTranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.K2eTranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.TranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.TryTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.*;
 import org.mjulikelion.engnews.dto.ai.response.E2kResponseDto;
 import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
 import org.mjulikelion.engnews.dto.ai.response.K2eResponseDto;
@@ -23,10 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class TranslateController {
     private final TranslateService translateService;
 
-    @PostMapping("/try-translate")
-    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslate(@AuthenticatedUser User user, @RequestBody TryTranslateDto tryTranslateDto) {
-        FeedbackDto feedback=translateService.tryTranslate(user,tryTranslateDto);
-        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 번역하고 피드백 받기 성공", feedback));
+    @PostMapping("/try-translate/sentence")
+    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslateSentence(@AuthenticatedUser User user, @RequestBody TryTranslateSentenceDto tryTranslateSentenceDto) {
+        FeedbackDto feedback=translateService.tryTranslateSentence(user,tryTranslateSentenceDto);
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 번역하고 피드백 받기 성공(첫번째 통신)", feedback));
+    }
+
+    @PostMapping("/try-translate/message")
+    public ResponseEntity<ResponseDto<FeedbackDto>> tryTranslateMessage(@AuthenticatedUser User user, @RequestBody TryTranslateMessageDto tryTranslateMessageDto) {
+        FeedbackDto feedback=translateService.tryTranslateMessage(user,tryTranslateMessageDto);
+        return ResponseEntity.ok(ResponseDto.res(HttpStatus.OK, "기사 번역하고 피드백 받기 성공(두번째 이상 통신)", feedback));
     }
 
     @PostMapping("/translate")

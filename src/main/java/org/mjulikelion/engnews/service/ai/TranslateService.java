@@ -1,10 +1,7 @@
 package org.mjulikelion.engnews.service.ai;
 
 import lombok.RequiredArgsConstructor;
-import org.mjulikelion.engnews.dto.ai.request.E2kTranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.K2eTranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.TranslateDto;
-import org.mjulikelion.engnews.dto.ai.request.TryTranslateDto;
+import org.mjulikelion.engnews.dto.ai.request.*;
 import org.mjulikelion.engnews.dto.ai.response.E2kResponseDto;
 import org.mjulikelion.engnews.dto.ai.response.FeedbackDto;
 import org.mjulikelion.engnews.dto.ai.response.K2eResponseDto;
@@ -22,7 +19,7 @@ public class TranslateService {
     private final String e2kTranslateURL = "http://13.209.83.200:8000/translate_t5_e2k";
     private final String k2eTranslateURL = "http://13.209.83.200:8000/translate_t5_k2e";
 
-    public FeedbackDto tryTranslate(User user, TryTranslateDto tryTranslateDto) {
+    public FeedbackDto tryTranslateSentence(User user, TryTranslateSentenceDto tryTranslateSentenceDto) {
 
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -30,7 +27,28 @@ public class TranslateService {
         headers.add("user", String.valueOf(user.getId()));
 
         // HTTP 요청 엔터티 생성 (헤더 + 바디)
-        HttpEntity<TryTranslateDto> entity = new HttpEntity<>(tryTranslateDto, headers);
+        HttpEntity<TryTranslateSentenceDto> entity = new HttpEntity<>(tryTranslateSentenceDto, headers);
+
+        // POST 요청 전송
+        ResponseEntity<String> response = restTemplate.exchange(try_TranslateURL, HttpMethod.POST, entity, String.class);
+
+
+        FeedbackDto feedback = FeedbackDto.builder()
+                .gpt_answer(response.getBody())
+                .build();
+
+        return feedback;
+    }
+
+    public FeedbackDto tryTranslateMessage(User user, TryTranslateMessageDto tryTranslateMessageDto) {
+
+        // HTTP 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON); //Json형식
+        headers.add("user", String.valueOf(user.getId()));
+
+        // HTTP 요청 엔터티 생성 (헤더 + 바디)
+        HttpEntity<TryTranslateMessageDto> entity = new HttpEntity<>(tryTranslateMessageDto, headers);
 
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(try_TranslateURL, HttpMethod.POST, entity, String.class);
