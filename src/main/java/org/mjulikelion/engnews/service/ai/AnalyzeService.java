@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class AnalyzeService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String analyze_Sentence = "http://43.203.141.103:8000/analyze-sentence";
+    private final String analyze_Sentence = "http://13.209.83.200:8000/analyze-sentence";
 
     public FeedbackDto analyzeSentence(User user, AnalyzeSentenceDto analyzeSentenceDto){
 

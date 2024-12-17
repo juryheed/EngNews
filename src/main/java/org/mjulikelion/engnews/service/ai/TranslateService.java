@@ -17,10 +17,10 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class TranslateService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String try_TranslateURL = "http://43.203.141.103:8000/try-translate";
-    private final String translateURL = "http://43.203.141.103:8000/translate";
-    private final String e2kTranslateURL = "http://43.203.141.103:8000/translate_t5_e2k";
-    private final String k2eTranslateURL = "http://43.203.141.103:8000/translate_t5_k2e";
+    private final String try_TranslateURL = "http://13.209.83.200:8000/try-translate";
+    private final String translateURL = "http://13.209.83.200:8000/translate";
+    private final String e2kTranslateURL = "http://13.209.83.200:8000/translate_t5_e2k";
+    private final String k2eTranslateURL = "http://13.209.83.200:8000/translate_t5_k2e";
 
     public FeedbackDto tryTranslate(User user, TryTranslateDto tryTranslateDto) {
 

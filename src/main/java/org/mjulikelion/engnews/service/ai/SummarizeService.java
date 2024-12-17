@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class SummarizeService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String trySummarizeURL = "http://43.203.141.103:8000/try-summarize";
+    private final String trySummarizeURL = "http://13.209.83.200:8000/try-summarize";
 
     public FeedbackDto trySummarize(User user, TrySummarizeDto trySummarizeDto){
 
