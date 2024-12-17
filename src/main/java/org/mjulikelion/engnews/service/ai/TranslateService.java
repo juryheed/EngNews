@@ -32,9 +32,10 @@ public class TranslateService {
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(try_TranslateURL, HttpMethod.POST, entity, String.class);
 
+        String processedResponse = cleanGptAnswer(response.getBody());
 
         FeedbackDto feedback = FeedbackDto.builder()
-                .gpt_answer(response.getBody())
+                .gpt_answer(processedResponse)
                 .build();
 
         return feedback;
@@ -53,9 +54,10 @@ public class TranslateService {
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(try_TranslateURL, HttpMethod.POST, entity, String.class);
 
+        String processedResponse = cleanGptAnswer(response.getBody());
 
         FeedbackDto feedback = FeedbackDto.builder()
-                .gpt_answer(response.getBody())
+                .gpt_answer(processedResponse)
                 .build();
 
         return feedback;
