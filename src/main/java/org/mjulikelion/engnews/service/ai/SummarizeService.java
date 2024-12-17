@@ -30,9 +30,10 @@ public class SummarizeService {
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(trySummarizeURL, HttpMethod.POST, entity, String.class);
 
+        String processedResponse = cleanGptAnswer(response.getBody());
 
         FeedbackDto feedback = FeedbackDto.builder()
-                .gpt_answer(response.getBody())
+                .gpt_answer(processedResponse)
                 .build();
 
         return feedback;
