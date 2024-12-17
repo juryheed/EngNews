@@ -40,8 +40,6 @@ public class NYTNewsService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final KeywordRepository keywordRepository;
     private final CategoryRepository categoryRepository;
-    private final ArticleLikeService articleLikeService;
-    private final NaverNewsService naverNewsService;
     private final ArticleLikeRepository articleLikeRepository;
 
     // 키워드 별 NYT 뉴스 목록 조회
