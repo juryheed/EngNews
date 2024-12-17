@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TryTranslateDto {
+public class TryTranslateSentenceDto {
     String news_sentence;
-    String message;
 }
