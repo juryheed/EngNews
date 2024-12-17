@@ -3,6 +3,7 @@ package org.mjulikelion.engnews.service;
 import lombok.AllArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.mjulikelion.engnews.dto.response.article.ArticleNytDto;
 import org.mjulikelion.engnews.dto.response.articleLike.ArticleLikeListResponseDto;
 import org.mjulikelion.engnews.dto.response.articleLike.ArticleLikeResponseDto;
 import org.mjulikelion.engnews.entity.ArticleLike;
@@ -19,6 +20,7 @@ import java.util.List;
 public class ArticleLikeService {
 
     private final ArticleLikeRepository articleLikeRepository;
+    private final NYTNewsService nytNewsService;
 
     public ArticleLikeListResponseDto getNaverArticleLikes(User user) {
         List<ArticleLike> articleLikes = articleLikeRepository.findAllByUserAndNews(user, "naver");
@@ -45,12 +47,16 @@ public class ArticleLikeService {
 
         List<ArticleLikeResponseDto> articleLikeDtos = articleLikes.stream()
                 .map(articleLike -> {
-                    String[] titleAndImageAndContent = getTitleImageAndContentFromUrl(articleLike.getOriginalUrl());
+                    // API 호출을 통해 제목, 이미지, 내용 가져오기
+                    String url = articleLike.getOriginalUrl();
+                    ArticleNytDto nytArticle = nytNewsService.getNYTNews(user, url);  // getNYTNews 사용하여 데이터 가져오기
+
+                    // ArticleLikeResponseDto로 변환
                     return ArticleLikeResponseDto.from(
                             articleLike,
-                            titleAndImageAndContent[0],
-                            titleAndImageAndContent[1],
-                            titleAndImageAndContent[2]
+                            nytArticle.getTitle(),
+                            nytArticle.getImageUrl(),
+                            nytArticle.getContent()
                     );
                 })
                 .toList();
@@ -59,6 +65,7 @@ public class ArticleLikeService {
                 .articleLikes(articleLikeDtos)
                 .build();
     }
+
 
 
     public String[] getTitleImageAndContentFromUrl(String url) {
