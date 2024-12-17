@@ -185,11 +185,11 @@ public class NYTNewsService {
             if (!metaTags.isEmpty()) {
                 return metaTags.first().attr("content");
             } else {
-                return "https://via.placeholder.com/150";
+                return "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F156DF3394EFC1EDA17";
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return "https://via.placeholder.com/150";
+            return "https://img1.daumcdn.net/thumb/R800x0/?scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.net%2Fcfile%2Ftistory%2F156DF3394EFC1EDA17";
         }
     }
 
