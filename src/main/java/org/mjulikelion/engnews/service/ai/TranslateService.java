@@ -75,8 +75,10 @@ public class TranslateService {
         // POST 요청 전송
         ResponseEntity<String> response = restTemplate.exchange(translateURL, HttpMethod.POST, entity, String.class);
 
+        String processedResponse = cleanGptAnswer(response.getBody());
+
         FeedbackDto feedback = FeedbackDto.builder()
-                .gpt_answer(response.getBody())
+                .gpt_answer(processedResponse)
                 .build();
 
         return feedback;
@@ -114,5 +116,20 @@ public class TranslateService {
         return K2eResponseDto.builder()
                 .answer(response.getBody())
                 .build();
+    }
+
+
+    // 문자열 처리 메서드
+    private String cleanGptAnswer(String gptAnswer) {
+        if (gptAnswer == null || gptAnswer.isEmpty()) {
+            return gptAnswer;
+        }
+
+        gptAnswer = gptAnswer.replace("\n  \"gpt_answer\":", "").trim();
+
+        if (gptAnswer.startsWith("{") && gptAnswer.endsWith("}")) {
+            gptAnswer = gptAnswer.substring(1, gptAnswer.length() - 1).trim();
+        }
+        return gptAnswer;
     }
 }
